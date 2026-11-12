@@ -1,0 +1,1 @@
+SELECT * FROM q37 JOIN q37dim USING (d);

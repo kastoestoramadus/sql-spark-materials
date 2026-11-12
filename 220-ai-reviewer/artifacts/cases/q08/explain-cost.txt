@@ -1,0 +1,11 @@
+== Optimized Logical Plan ==
+Project [o_id#140L, amount#145], Statistics(sizeInBytes=101.3 KiB)
++- Filter (gettimestamp(order_ts#144, MM/dd/yyyy, TimestampType, Some(Europe/Warsaw), false) >= 2024-01-01 00:00:00), Statistics(sizeInBytes=405.2 KiB)
+   +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+
+== Physical Plan ==
+*(1) Project [o_id#140L, amount#145]
++- *(1) Filter (gettimestamp(order_ts#144, MM/dd/yyyy, TimestampType, Some(Europe/Warsaw), false) >= 2024-01-01 00:00:00)
+   +- *(1) ColumnarToRow
+      +- FileScan parquet spark_catalog.default.orders[o_id#140L,order_ts#144,amount#145] Batched: true, DataFilters: [(gettimestamp(order_ts#144, MM/dd/yyyy, TimestampType, Some(Europe/Warsaw), false) >= 2024-01-01..., Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<o_id:bigint,order_ts:string,amount:decimal(10,2)>
+

@@ -1,0 +1,22 @@
+{
+ "n": "32",
+ "name": "like-pattern-injection",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "032",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "user input unescaped in LIKE",
+  "% is a wildcard",
+  "ESCAPE"
+ ],
+ "non_defects": [
+  "ORDER BY nm is fine",
+  "the row '10 percent' matching a search for '10%' only literally is the point \u2014 matching it via wildcard is the bug"
+ ],
+ "df_variants": []
+}

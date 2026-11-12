@@ -1,0 +1,25 @@
+{
+ "n": "08",
+ "name": "topk-tie-arbitrary-winner",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "008",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "ties on the sort key",
+  "arbitrary winner",
+  "nondeterministic"
+ ],
+ "non_defects": [
+  "ORDER BY score DESC itself is correct",
+  "the four scores being equal is legitimate data"
+ ],
+ "df_variants": [
+  "spark.table('q08').repartition(3).orderBy('score', ascending=False).limit(1).collect()[0][0]",
+  "spark.table('q08').repartition(7).orderBy('score', ascending=False).limit(1).collect()[0][0]"
+ ]
+}

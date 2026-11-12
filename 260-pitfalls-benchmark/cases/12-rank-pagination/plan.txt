@@ -1,0 +1,38 @@
+== Parsed Logical Plan ==
+'Project ['player, 'score]
++- 'Filter ('rk <= 2)
+   +- 'SubqueryAlias __auto_generated_subquery_name
+      +- 'Project ['player, 'score, 'RANK() windowspecdefinition('score DESC NULLS LAST, unspecifiedframe$()) AS rk#409]
+         +- 'UnresolvedRelation [q12], [], false
+== Analyzed Logical Plan ==
+player: string, score: int
+Project [player#416, score#417]
++- Filter (rk#409 <= 2)
+   +- SubqueryAlias __auto_generated_subquery_name
+      +- Project [player#416, score#417, rk#409]
+         +- Project [player#416, score#417, rk#409, rk#409]
+            +- Window [rank(score#417) windowspecdefinition(score#417 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rk#409], [score#417 DESC NULLS LAST]
+               +- Project [player#416, score#417]
+                  +- SubqueryAlias q12
+                     +- View (`q12`, [player#416, score#417])
+                        +- Project [cast(player#414 as string) AS player#416, cast(score#415 as int) AS score#417]
+                           +- Project [player#414, score#415]
+                              +- SubqueryAlias t
+                                 +- LocalRelation [player#414, score#415]
+== Optimized Logical Plan ==
+Project [player#416, score#417]
++- Filter (rk#409 <= 2)
+   +- Window [rank(score#417) windowspecdefinition(score#417 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rk#409], [score#417 DESC NULLS LAST]
+      +- WindowGroupLimit [score#417 DESC NULLS LAST], rank(score#417), 2
+         +- LocalRelation [player#416, score#417]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [player#416, score#417]
+   +- Filter (rk#409 <= 2)
+      +- Window [rank(score#417) windowspecdefinition(score#417 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rk#409], [score#417 DESC NULLS LAST]
+         +- WindowGroupLimit [score#417 DESC NULLS LAST], rank(score#417), 2, Final
+            +- Sort [score#417 DESC NULLS LAST], false, 0
+               +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=1668]
+                  +- WindowGroupLimit [score#417 DESC NULLS LAST], rank(score#417), 2, Partial
+                     +- Sort [score#417 DESC NULLS LAST], false, 0
+                        +- LocalTableScan [player#416, score#417]

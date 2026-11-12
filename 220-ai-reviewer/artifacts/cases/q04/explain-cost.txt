@@ -1,0 +1,15 @@
+== Optimized Logical Plan ==
+Aggregate [region#146], [region#146, sum(amount#145) AS revenue#165], Statistics(sizeInBytes=185.7 KiB)
++- Project [amount#145, region#146], Statistics(sizeInBytes=151.9 KiB)
+   +- Filter (isnotnull(status#142) AND NOT (status#142 = CANCELLED)), Statistics(sizeInBytes=405.2 KiB)
+      +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+
+== Physical Plan ==
+*(2) HashAggregate(keys=[region#146], functions=[sum(amount#145)], output=[region#146, revenue#165])
++- Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=423]
+   +- *(1) HashAggregate(keys=[region#146], functions=[partial_sum(amount#145)], output=[region#146, sum#171, isEmpty#172])
+      +- *(1) Project [amount#145, region#146]
+         +- *(1) Filter (isnotnull(status#142) AND NOT (status#142 = CANCELLED))
+            +- *(1) ColumnarToRow
+               +- FileScan parquet spark_catalog.default.orders[status#142,amount#145,region#146] Batched: true, DataFilters: [isnotnull(status#142), NOT (status#142 = CANCELLED)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(status), Not(EqualTo(status,CANCELLED))], ReadSchema: struct<status:string,amount:decimal(10,2),region:string>
+

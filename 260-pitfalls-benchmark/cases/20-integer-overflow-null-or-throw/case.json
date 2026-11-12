@@ -1,0 +1,26 @@
+{
+ "n": "20",
+ "name": "integer-overflow-null-or-throw",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "020",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "INT overflow unguarded",
+  "result depends on spark.sql.ansi.enabled",
+  "silent wraparound in non-ANSI mode"
+ ],
+ "non_defects": [
+  "INT for a and b is fine at current values",
+  "the 10+20 row is not the problem"
+ ],
+ "df_variants": [
+  "spark.conf.set('spark.sql.ansi.enabled','false')",
+  "spark.sql('SELECT id, a + b FROM q20').collect()",
+  "spark.conf.set('spark.sql.ansi.enabled','true')"
+ ]
+}

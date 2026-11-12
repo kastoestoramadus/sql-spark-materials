@@ -1,0 +1,38 @@
+== Parsed Logical Plan ==
+'Project [*]
++- 'Join UsingJoin(Inner, [d])
+   :- 'UnresolvedRelation [q37], [], false
+   +- 'UnresolvedRelation [q37dim], [], false
+== Analyzed Logical Plan ==
+d: bigint, k: bigint, payload_a: string, payload_b: string, payload_c: string, payload_d: string, payload_e: string, payload_f: string, payload_g: string, payload_h: string, payload_i: string, payload_j: string, tier: string
+Project [d#1257L, k#1256L, payload_a#1258, payload_b#1259, payload_c#1260, payload_d#1261, payload_e#1262, payload_f#1263, payload_g#1264, payload_h#1265, payload_i#1266, payload_j#1267, tier#1272]
++- Project [d#1257L, k#1256L, payload_a#1258, payload_b#1259, payload_c#1260, payload_d#1261, payload_e#1262, payload_f#1263, payload_g#1264, payload_h#1265, payload_i#1266, payload_j#1267, tier#1272]
+   +- Join Inner, (d#1257L = d#1271L)
+      :- SubqueryAlias q37
+      :  +- View (`q37`, [k#1256L, d#1257L, payload_a#1258, payload_b#1259, payload_c#1260, payload_d#1261, payload_e#1262, payload_f#1263, payload_g#1264, payload_h#1265, payload_i#1266, payload_j#1267])
+      :     +- Project [cast(k#1244L as bigint) AS k#1256L, cast(d#1245L as bigint) AS d#1257L, cast(payload_a#1246 as string) AS payload_a#1258, cast(payload_b#1247 as string) AS payload_b#1259, cast(payload_c#1248 as string) AS payload_c#1260, cast(payload_d#1249 as string) AS payload_d#1261, cast(payload_e#1250 as string) AS payload_e#1262, cast(payload_f#1251 as string) AS payload_f#1263, cast(payload_g#1252 as string) AS payload_g#1264, cast(payload_h#1253 as string) AS payload_h#1265, cast(payload_i#1254 as string) AS payload_i#1266, cast(payload_j#1255 as string) AS payload_j#1267]
+      :        +- Project [id#1268L AS k#1244L, (id#1268L % cast(40 as bigint)) AS d#1245L, lpad(cast(id#1268L as string), 180, x) AS payload_a#1246, lpad(cast(id#1268L as string), 180, x) AS payload_b#1247, lpad(cast(id#1268L as string), 180, x) AS payload_c#1248, lpad(cast(id#1268L as string), 180, x) AS payload_d#1249, lpad(cast(id#1268L as string), 180, x) AS payload_e#1250, lpad(cast(id#1268L as string), 180, x) AS payload_f#1251, lpad(cast(id#1268L as string), 180, x) AS payload_g#1252, lpad(cast(id#1268L as string), 180, x) AS payload_h#1253, lpad(cast(id#1268L as string), 180, x) AS payload_i#1254, lpad(cast(id#1268L as string), 180, x) AS payload_j#1255]
+      :           +- Range (0, 20000, step=1)
+      +- SubqueryAlias q37dim
+         +- View (`q37dim`, [d#1271L, tier#1272])
+            +- Project [cast(d#1269L as bigint) AS d#1271L, cast(tier#1270 as string) AS tier#1272]
+               +- Project [id#1273L AS d#1269L, concat(tier-, cast(id#1273L as string)) AS tier#1270]
+                  +- Range (0, 40, step=1)
+== Optimized Logical Plan ==
+Project [d#1257L, k#1256L, payload_a#1258, payload_b#1259, payload_c#1260, payload_d#1261, payload_e#1262, payload_f#1263, payload_g#1264, payload_h#1265, payload_i#1266, payload_j#1267, tier#1272]
++- Join Inner, (d#1257L = d#1271L)
+   :- Project [id#1268L AS k#1256L, (id#1268L % 40) AS d#1257L, lpad(cast(id#1268L as string), 180, x) AS payload_a#1258, lpad(cast(id#1268L as string), 180, x) AS payload_b#1259, lpad(cast(id#1268L as string), 180, x) AS payload_c#1260, lpad(cast(id#1268L as string), 180, x) AS payload_d#1261, lpad(cast(id#1268L as string), 180, x) AS payload_e#1262, lpad(cast(id#1268L as string), 180, x) AS payload_f#1263, lpad(cast(id#1268L as string), 180, x) AS payload_g#1264, lpad(cast(id#1268L as string), 180, x) AS payload_h#1265, lpad(cast(id#1268L as string), 180, x) AS payload_i#1266, lpad(cast(id#1268L as string), 180, x) AS payload_j#1267]
+   :  +- Filter isnotnull((id#1268L % 40))
+   :     +- Range (0, 20000, step=1)
+   +- Project [id#1273L AS d#1271L, concat(tier-, cast(id#1273L as string)) AS tier#1272]
+      +- Range (0, 40, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [d#1257L, k#1256L, payload_a#1258, payload_b#1259, payload_c#1260, payload_d#1261, payload_e#1262, payload_f#1263, payload_g#1264, payload_h#1265, payload_i#1266, payload_j#1267, tier#1272]
+   +- BroadcastHashJoin [d#1257L], [d#1271L], Inner, BuildRight, false, false
+      :- Project [id#1268L AS k#1256L, (id#1268L % 40) AS d#1257L, lpad(cast(id#1268L as string), 180, x) AS payload_a#1258, lpad(cast(id#1268L as string), 180, x) AS payload_b#1259, lpad(cast(id#1268L as string), 180, x) AS payload_c#1260, lpad(cast(id#1268L as string), 180, x) AS payload_d#1261, lpad(cast(id#1268L as string), 180, x) AS payload_e#1262, lpad(cast(id#1268L as string), 180, x) AS payload_f#1263, lpad(cast(id#1268L as string), 180, x) AS payload_g#1264, lpad(cast(id#1268L as string), 180, x) AS payload_h#1265, lpad(cast(id#1268L as string), 180, x) AS payload_i#1266, lpad(cast(id#1268L as string), 180, x) AS payload_j#1267]
+      :  +- Filter isnotnull((id#1268L % 40))
+      :     +- Range (0, 20000, step=1, splits=1)
+      +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, bigint, false]),false), [plan_id=4490]
+         +- Project [id#1273L AS d#1271L, concat(tier-, cast(id#1273L as string)) AS tier#1272]
+            +- Range (0, 40, step=1, splits=1)

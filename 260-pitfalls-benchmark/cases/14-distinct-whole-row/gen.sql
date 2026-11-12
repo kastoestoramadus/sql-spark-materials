@@ -1,0 +1,1 @@
+CREATE OR REPLACE TEMP VIEW q14 AS SELECT * FROM VALUES (1,'x'),(1,'y'),(2,'z') AS t(a,b);

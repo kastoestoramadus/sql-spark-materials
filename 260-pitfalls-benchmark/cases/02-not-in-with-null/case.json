@@ -1,0 +1,22 @@
+{
+ "n": "02",
+ "name": "not-in-with-null",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "002",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "NOT IN",
+  "NULL in subquery",
+  "no rows returned"
+ ],
+ "non_defects": [
+  "the deny value 2 correctly removes id 2",
+  "IN (without NOT) would behave differently"
+ ],
+ "df_variants": []
+}

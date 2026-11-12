@@ -1,0 +1,21 @@
+== Parsed Logical Plan ==
+'Project ['SUM('ROUND('amt)) AS total#679]
++- 'UnresolvedRelation [q19], [], false
+== Analyzed Logical Plan ==
+total: double
+Aggregate [sum(round(amt#685, 0)) AS total#679]
++- SubqueryAlias q19
+   +- View (`q19`, [amt#685])
+      +- Project [cast(amt#684 as double) AS amt#685]
+         +- Project [amt#684]
+            +- SubqueryAlias t
+               +- LocalRelation [amt#684]
+== Optimized Logical Plan ==
+Aggregate [sum(round(amt#685, 0)) AS total#679]
++- LocalRelation [amt#685]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[sum(round(amt#685, 0))], output=[total#679])
+   +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=2745]
+      +- HashAggregate(keys=[], functions=[partial_sum(round(amt#685, 0))], output=[sum#688])
+         +- LocalTableScan [amt#685]

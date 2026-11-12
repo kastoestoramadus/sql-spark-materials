@@ -1,0 +1,18 @@
+== Parsed Logical Plan ==
+'Project ['id]
++- 'Filter ('note = null)
+   +- 'UnresolvedRelation [q01], [], false
+== Analyzed Logical Plan ==
+id: int
+Project [id#8]
++- Filter (note#9 = null)
+   +- SubqueryAlias q01
+      +- View (`q01`, [id#8, note#9])
+         +- Project [cast(id#6 as int) AS id#8, cast(note#7 as string) AS note#9]
+            +- Project [id#6, note#7]
+               +- SubqueryAlias t
+                  +- LocalRelation [id#6, note#7]
+== Optimized Logical Plan ==
+LocalRelation <empty>, [id#8]
+== Physical Plan ==
+LocalTableScan <empty>, [id#8]

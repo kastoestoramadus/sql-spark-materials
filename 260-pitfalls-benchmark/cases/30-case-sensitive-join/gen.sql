@@ -1,0 +1,2 @@
+CREATE OR REPLACE TEMP VIEW q30a AS SELECT * FROM VALUES ('ALICE',10),('bob',20) AS t(name,amt);
+CREATE OR REPLACE TEMP VIEW q30b AS SELECT * FROM VALUES ('alice','x'),('BOB','y') AS t(name,grp);

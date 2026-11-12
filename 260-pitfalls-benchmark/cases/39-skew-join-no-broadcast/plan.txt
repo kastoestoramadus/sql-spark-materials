@@ -1,0 +1,37 @@
+== Parsed Logical Plan ==
+'Aggregate ['q39dim.label], ['q39dim.label, 'count(1) AS n#1448]
++- 'Join Inner, ('q39.k = 'q39dim.k)
+   :- 'UnresolvedRelation [q39], [], false
+   +- 'UnresolvedRelation [q39dim], [], false
+== Analyzed Logical Plan ==
+label: string, n: bigint
+Aggregate [label#1461], [label#1461, count(1) AS n#1448L]
++- Join Inner, (k#1455L = cast(k#1460 as bigint))
+   :- SubqueryAlias q39
+   :  +- View (`q39`, [id#1454L, k#1455L])
+   :     +- Project [cast(id#1456L as bigint) AS id#1454L, cast(k#1453L as bigint) AS k#1455L]
+   :        +- Project [id#1456L, CASE WHEN (id#1456L < cast(18000 as bigint)) THEN cast(0 as bigint) ELSE id#1456L END AS k#1453L]
+   :           +- Range (0, 20000, step=1)
+   +- SubqueryAlias q39dim
+      +- View (`q39dim`, [k#1460, label#1461, pad#1462])
+         +- Project [cast(k#1457 as int) AS k#1460, cast(label#1458 as string) AS label#1461, cast(pad#1459 as string) AS pad#1462]
+            +- Project [k#1457, label#1458, lpad(label#1458, 3000000, z) AS pad#1459]
+               +- SubqueryAlias t
+                  +- LocalRelation [k#1457, label#1458]
+== Optimized Logical Plan ==
+Aggregate [label#1461], [label#1461, count(1) AS n#1448L]
++- Project [label#1461]
+   +- Join Inner, (k#1455L = cast(k#1460 as bigint))
+      :- Project [CASE WHEN (id#1456L < 18000) THEN 0 ELSE id#1456L END AS k#1455L]
+      :  +- Range (0, 20000, step=1)
+      +- LocalRelation [k#1460, label#1461]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[label#1461], functions=[count(1)], output=[label#1461, n#1448L])
+   +- HashAggregate(keys=[label#1461], functions=[partial_count(1)], output=[label#1461, count#1465L])
+      +- Project [label#1461]
+         +- BroadcastHashJoin [k#1455L], [cast(k#1460 as bigint)], Inner, BuildRight, false, false
+            :- Project [CASE WHEN (id#1456L < 18000) THEN 0 ELSE id#1456L END AS k#1455L]
+            :  +- Range (0, 20000, step=1, splits=1)
+            +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=4823]
+               +- LocalTableScan [k#1460, label#1461]

@@ -1,0 +1,26 @@
+== Parsed Logical Plan ==
+'GlobalLimit 1
++- 'LocalLimit 1
+   +- 'Sort ['nm ASC NULLS FIRST], true
+      +- 'Project ['nm]
+         +- 'UnresolvedRelation [q29], [], false
+== Analyzed Logical Plan ==
+nm: string
+GlobalLimit 1
++- LocalLimit 1
+   +- Sort [nm#961 ASC NULLS FIRST], true
+      +- Project [nm#961]
+         +- SubqueryAlias q29
+            +- View (`q29`, [nm#961])
+               +- Project [cast(nm#960 as string) AS nm#961]
+                  +- Project [nm#960]
+                     +- SubqueryAlias t
+                        +- LocalRelation [nm#960]
+== Optimized Logical Plan ==
+GlobalLimit 1
++- LocalLimit 1
+   +- Sort [nm#961 ASC NULLS FIRST], true
+      +- LocalRelation [nm#961]
+== Physical Plan ==
+TakeOrderedAndProject(limit=1, orderBy=[nm#961 ASC NULLS FIRST], output=[nm#961])
++- LocalTableScan [nm#961]

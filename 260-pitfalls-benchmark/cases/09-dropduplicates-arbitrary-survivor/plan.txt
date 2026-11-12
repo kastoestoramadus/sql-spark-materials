@@ -1,0 +1,16 @@
+== Parsed Logical Plan ==
+'Project ['id, 'payload, 'ts]
++- 'UnresolvedRelation [q09], [], false
+== Analyzed Logical Plan ==
+id: int, payload: string, ts: string
+Project [id#291, payload#292, ts#293]
++- SubqueryAlias q09
+   +- View (`q09`, [id#291, payload#292, ts#293])
+      +- Project [cast(id#288 as int) AS id#291, cast(payload#289 as string) AS payload#292, cast(ts#290 as string) AS ts#293]
+         +- Project [id#288, payload#289, ts#290]
+            +- SubqueryAlias t
+               +- LocalRelation [id#288, payload#289, ts#290]
+== Optimized Logical Plan ==
+LocalRelation [id#291, payload#292, ts#293]
+== Physical Plan ==
+LocalTableScan [id#291, payload#292, ts#293]

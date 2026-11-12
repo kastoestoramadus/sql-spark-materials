@@ -1,0 +1,1 @@
+CREATE OR REPLACE TEMP VIEW q23 AS SELECT * FROM VALUES ('10'),('0010'),('10 '),('abc') AS t(s);

@@ -1,0 +1,30 @@
+{
+ "n": "39",
+ "name": "skew-join-no-broadcast",
+ "difficulty": "hard",
+ "category": "performance",
+ "pitfall": "-",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "skewed join key",
+  "join strategy not pinned",
+  "one straggler task processes the hot key",
+  "planner picks broadcast or sort-merge depending on stats and threshold"
+ ],
+ "non_defects": [
+  "the CASE WHEN generating k is fine",
+  "GROUP BY label is fine"
+ ],
+ "df_variants": [
+  "sum(1 for l in spark.sql('SELECT q39dim.label, count(*) AS n FROM q39 JOIN q39dim ON q39.k = q39dim.k GROUP BY q39dim.label')._jdf.queryExecution().executedPlan().toString().splitlines() if 'SortMergeJoin' in l)",
+  "sum(1 for l in spark.sql('SELECT /*+ BROADCAST(q39dim) */ q39dim.label, count(*) AS n FROM q39 JOIN q39dim ON q39.k = q39dim.k GROUP BY q39dim.label')._jdf.queryExecution().executedPlan().toString().splitlines() if 'BroadcastHashJoin' in l)",
+  "spark.conf.set('spark.sql.autoBroadcastJoinThreshold','-1')",
+  "sum(1 for l in spark.sql('SELECT q39dim.label, count(*) AS n FROM q39 JOIN q39dim ON q39.k = q39dim.k GROUP BY q39dim.label')._jdf.queryExecution().executedPlan().toString().splitlines() if 'SortMergeJoin' in l)",
+  "sum(1 for l in spark.sql('SELECT /*+ BROADCAST(q39dim) */ q39dim.label, count(*) AS n FROM q39 JOIN q39dim ON q39.k = q39dim.k GROUP BY q39dim.label')._jdf.queryExecution().executedPlan().toString().splitlines() if 'BroadcastHashJoin' in l)",
+  "spark.conf.set('spark.sql.autoBroadcastJoinThreshold','10485760b')"
+ ]
+}

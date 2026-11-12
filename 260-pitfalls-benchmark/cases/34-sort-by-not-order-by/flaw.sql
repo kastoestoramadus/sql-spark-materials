@@ -1,0 +1,1 @@
+SELECT id, k FROM q34 DISTRIBUTE BY bucket SORT BY k;

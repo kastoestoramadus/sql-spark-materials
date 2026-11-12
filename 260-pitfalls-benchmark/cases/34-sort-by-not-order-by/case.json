@@ -1,0 +1,22 @@
+{
+ "n": "34",
+ "name": "sort-by-not-order-by",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "034",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "SORT BY is per-partition",
+  "DISTRIBUTE BY",
+  "not a global order"
+ ],
+ "non_defects": [
+  "partitioning by bucket before sorting is a legitimate technique",
+  "id % 4 as a key is fine"
+ ],
+ "df_variants": []
+}

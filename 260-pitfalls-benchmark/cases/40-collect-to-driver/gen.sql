@@ -1,0 +1,1 @@
+CREATE OR REPLACE TEMP VIEW q40 AS SELECT id, (id % 100) AS grp, lpad(CAST(id AS STRING), 50, 'x') AS pad FROM range(100000);

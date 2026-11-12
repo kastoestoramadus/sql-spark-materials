@@ -1,0 +1,3 @@
+Find the defect in this query (correctness or serious performance problem).
+
+SELECT o_id, amount, amount * 1.23 AS gross FROM orders

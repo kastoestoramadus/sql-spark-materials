@@ -1,0 +1,22 @@
+{
+ "n": "23",
+ "name": "implicit-cast-compare",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "023",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "implicit cast of string to int",
+  "unparseable becomes NULL",
+  "silent row loss"
+ ],
+ "non_defects": [
+  "'0010' matching 10 is correct cast behaviour, not a bug",
+  "the ORDER BY is irrelevant"
+ ],
+ "df_variants": []
+}

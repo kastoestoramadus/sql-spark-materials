@@ -1,0 +1,24 @@
+== Parsed Logical Plan ==
+'Project ['COUNT(distinct 'to_timestamp('ts, yyyy-MM-dd HH:mm:ss)) AS distinct_instants#855]
++- 'UnresolvedRelation [q26], [], false
+== Analyzed Logical Plan ==
+distinct_instants: bigint
+Aggregate [count(distinct to_timestamp(ts#862, Some(yyyy-MM-dd HH:mm:ss), TimestampType, Some(UTC), true)) AS distinct_instants#855L]
++- SubqueryAlias q26
+   +- View (`q26`, [ts#862, off#863])
+      +- Project [cast(ts#860 as string) AS ts#862, cast(off#861 as string) AS off#863]
+         +- Project [ts#860, off#861]
+            +- SubqueryAlias t
+               +- LocalRelation [ts#860, off#861]
+== Optimized Logical Plan ==
+Aggregate [count(distinct gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)) AS distinct_instants#855L]
++- LocalRelation [ts#862]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(distinct gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865)], output=[distinct_instants#855L])
+   +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=3295]
+      +- HashAggregate(keys=[], functions=[partial_count(distinct gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865)], output=[count#868L])
+         +- HashAggregate(keys=[gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865], functions=[], output=[gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865])
+            +- Exchange hashpartitioning(gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865, 4), ENSURE_REQUIREMENTS, [plan_id=3291]
+               +- HashAggregate(keys=[gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true) AS gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865], functions=[], output=[gettimestamp(ts#862, yyyy-MM-dd HH:mm:ss, TimestampType, try_to_timestamp, Some(UTC), true)#865])
+                  +- LocalTableScan [ts#862]

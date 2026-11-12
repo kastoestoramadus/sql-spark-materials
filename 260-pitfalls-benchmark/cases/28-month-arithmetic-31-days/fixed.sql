@@ -1,0 +1,1 @@
+SELECT d + INTERVAL 1 MONTH AS next_month FROM q28;

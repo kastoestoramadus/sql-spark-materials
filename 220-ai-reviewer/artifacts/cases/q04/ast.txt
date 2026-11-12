@@ -1,0 +1,27 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=region, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Alias(
+      this=Sum(
+        this=Column(
+          this=Identifier(this=amount, quoted=False),
+          table=Identifier(this=o, quoted=False))),
+      alias=Identifier(this=revenue, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  where=Where(
+    this=NEQ(
+      this=Column(
+        this=Identifier(this=status, quoted=False),
+        table=Identifier(this=o, quoted=False)),
+      expression=Literal(this='CANCELLED', is_string=True))),
+  group=Group(
+    expressions=[
+      Column(
+        this=Identifier(this=region, quoted=False),
+        table=Identifier(this=o, quoted=False))]))

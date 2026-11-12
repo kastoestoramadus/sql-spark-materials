@@ -1,0 +1,25 @@
+== Parsed Logical Plan ==
+'Aggregate ['o.region], ['o.region, 'COUNT(distinct 'o.customer_id) AS customers]
+'SubqueryAlias o
+'UnresolvedRelation [orders], [], false
+== Analyzed Logical Plan ==
+Aggregate [region], [region, count(distinct customer_id) AS customers]
+SubqueryAlias o
+SubqueryAlias orders
+  +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Optimized Logical Plan ==
+Aggregate [region], [region, count(distinct customer_id) AS customers]
+Project [customer_id, region]
+Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Physical Plan ==
+[wcg]HashAggregate(keys=[region], functions=[count(distinct customer_id)], output=[region, customers])
+Exchange hashpartitioning(region, 200), ENSURE_REQUIREMENTS
+[wcg]HashAggregate(keys=[region], functions=[partial_count(distinct customer_id)], output=[region, count])
+  +- [wcg]HashAggregate(keys=[region, customer_id], functions=[], output=[region, customer_id])
+    +- Exchange hashpartitioning(region, customer_id, 200), ENSURE_REQUIREMENTS
+      +- [wcg]HashAggregate(keys=[region, customer_id], functions=[], output=[region, customer_id])
+        +- [wcg]ColumnarToRow
+          +- FileScan parquet orders[customer_id,region] Batched: true, DataFilters: [], Format: Parquet, Location: <paths elided>, PushedFilters: [], ReadSchema: <elided>
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=735]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region#146, customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_i

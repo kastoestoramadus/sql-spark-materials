@@ -1,0 +1,21 @@
+== Parsed Logical Plan ==
+'Project [unresolvedalias('count(1))]
++- 'UnresolvedRelation [q38], [], false
+== Analyzed Logical Plan ==
+count(1): bigint
+Aggregate [count(1) AS count(1)#1408L]
++- SubqueryAlias q38
+   +- View (`q38`, [id#1403L, k#1404L, pad#1405])
+      +- Project [cast(id#1406L as bigint) AS id#1403L, cast(k#1401L as bigint) AS k#1404L, cast(pad#1402 as string) AS pad#1405]
+         +- Project [id#1406L, (id#1406L % cast(20 as bigint)) AS k#1401L, lpad(cast(id#1406L as string), 100, p) AS pad#1402]
+            +- Range (0, 50000, step=1)
+== Optimized Logical Plan ==
+Aggregate [count(1) AS count(1)#1408L]
++- Project
+   +- Range (0, 50000, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(1)], output=[count(1)#1408L])
+   +- HashAggregate(keys=[], functions=[partial_count(1)], output=[count#1410L])
+      +- Project
+         +- Range (0, 50000, step=1, splits=1)

@@ -1,0 +1,15 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=o_id, quoted=False)),
+    Column(
+      this=Identifier(this=amount, quoted=False)),
+    Alias(
+      this=Mul(
+        this=Column(
+          this=Identifier(this=amount, quoted=False)),
+        expression=Literal(this=1.23, is_string=False)),
+      alias=Identifier(this=gross, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False))))

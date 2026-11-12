@@ -1,0 +1,1 @@
+SELECT nm FROM q32 WHERE nm LIKE '%10%%' ORDER BY nm;

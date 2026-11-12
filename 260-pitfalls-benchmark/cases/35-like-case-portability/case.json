@@ -1,0 +1,21 @@
+{
+ "n": "35",
+ "name": "like-case-portability",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "035",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "LIKE is case-sensitive in Spark",
+  "porting from sqlite or MySQL changes the result set"
+ ],
+ "non_defects": [
+  "filtering to a-prefix fruits is the goal",
+  "Banana is correctly excluded"
+ ],
+ "df_variants": []
+}

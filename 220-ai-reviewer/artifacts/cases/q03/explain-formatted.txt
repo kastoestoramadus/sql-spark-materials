@@ -1,0 +1,37 @@
+== Physical Plan ==
+* BroadcastHashJoin LeftAnti BuildRight (6)
+:- * ColumnarToRow (2)
+:  +- Scan parquet spark_catalog.default.customers (1)
++- BroadcastExchange (5)
+   +- * ColumnarToRow (4)
+      +- Scan parquet spark_catalog.default.support_tickets (3)
+
+
+(1) Scan parquet spark_catalog.default.customers
+Output [2]: [customer_id#147L, name#148]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/customers]
+ReadSchema: struct<customer_id:bigint,name:string>
+
+(2) ColumnarToRow [codegen id : 2]
+Input [2]: [customer_id#147L, name#148]
+
+(3) Scan parquet spark_catalog.default.support_tickets
+Output [1]: [customer_id#152L]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/support_tickets]
+ReadSchema: struct<customer_id:bigint>
+
+(4) ColumnarToRow [codegen id : 1]
+Input [1]: [customer_id#152L]
+
+(5) BroadcastExchange
+Input [1]: [customer_id#152L]
+Arguments: HashedRelationBroadcastMode(List(input[0, bigint, true]),true), [plan_id=386]
+
+(6) BroadcastHashJoin [codegen id : 2]
+Left keys [1]: [customer_id#147L]
+Right keys [1]: [customer_id#152L]
+Join type: LeftAnti
+Join condition: None
+

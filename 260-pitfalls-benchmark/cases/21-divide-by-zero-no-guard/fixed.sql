@@ -1,0 +1,1 @@
+SELECT n / NULLIF(d, 0) FROM q21;

@@ -1,0 +1,85 @@
+== Physical Plan ==
+* HashAggregate (14)
++- * HashAggregate (13)
+   +- * Project (12)
+      +- * SortMergeJoin Inner (11)
+         :- * Sort (5)
+         :  +- Exchange (4)
+         :     +- * Filter (3)
+         :        +- * ColumnarToRow (2)
+         :           +- Scan parquet spark_catalog.default.orders (1)
+         +- * Sort (10)
+            +- Exchange (9)
+               +- * Filter (8)
+                  +- * ColumnarToRow (7)
+                     +- Scan parquet spark_catalog.default.order_items (6)
+
+
+(1) Scan parquet spark_catalog.default.orders
+Output [2]: [o_id#140L, amount#145]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/orders]
+PushedFilters: [IsNotNull(o_id)]
+ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+
+(2) ColumnarToRow [codegen id : 1]
+Input [2]: [o_id#140L, amount#145]
+
+(3) Filter [codegen id : 1]
+Input [2]: [o_id#140L, amount#145]
+Condition : isnotnull(o_id#140L)
+
+(4) Exchange
+Input [2]: [o_id#140L, amount#145]
+Arguments: hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=617]
+
+(5) Sort [codegen id : 2]
+Input [2]: [o_id#140L, amount#145]
+Arguments: [o_id#140L ASC NULLS FIRST], false, 0
+
+(6) Scan parquet spark_catalog.default.order_items
+Output [2]: [o_id#195L, qty#196]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/order_items]
+PushedFilters: [IsNotNull(o_id)]
+ReadSchema: struct<o_id:bigint,qty:int>
+
+(7) ColumnarToRow [codegen id : 3]
+Input [2]: [o_id#195L, qty#196]
+
+(8) Filter [codegen id : 3]
+Input [2]: [o_id#195L, qty#196]
+Condition : isnotnull(o_id#195L)
+
+(9) Exchange
+Input [2]: [o_id#195L, qty#196]
+Arguments: hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=626]
+
+(10) Sort [codegen id : 4]
+Input [2]: [o_id#195L, qty#196]
+Arguments: [o_id#195L ASC NULLS FIRST], false, 0
+
+(11) SortMergeJoin [codegen id : 5]
+Left keys [1]: [o_id#140L]
+Right keys [1]: [o_id#195L]
+Join type: Inner
+Join condition: None
+
+(12) Project [codegen id : 5]
+Output [3]: [o_id#140L, amount#145, qty#196]
+Input [4]: [o_id#140L, amount#145, o_id#195L, qty#196]
+
+(13) HashAggregate [codegen id : 5]
+Input [3]: [o_id#140L, amount#145, qty#196]
+Keys [2]: [o_id#140L, amount#145]
+Functions [1]: [partial_sum(qty#196)]
+Aggregate Attributes [1]: [sum#203L]
+Results [3]: [o_id#140L, amount#145, sum#204L]
+
+(14) HashAggregate [codegen id : 5]
+Input [3]: [o_id#140L, amount#145, sum#204L]
+Keys [2]: [o_id#140L, amount#145]
+Functions [1]: [sum(qty#196)]
+Aggregate Attributes [1]: [sum(qty#196)#198L]
+Results [3]: [o_id#140L, amount#145, sum(qty#196)#198L AS qty#193L]
+

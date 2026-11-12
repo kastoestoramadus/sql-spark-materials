@@ -1,0 +1,1 @@
+SELECT player FROM q08 ORDER BY score DESC LIMIT 1;

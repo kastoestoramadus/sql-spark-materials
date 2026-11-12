@@ -1,0 +1,22 @@
+{
+ "n": "14",
+ "name": "distinct-whole-row",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "014",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "DISTINCT applies to whole row",
+  "extra column",
+  "two rows for a=1"
+ ],
+ "non_defects": [
+  "(2,'z') appearing once is correct",
+  "ORDER BY a,b is not the issue"
+ ],
+ "df_variants": []
+}

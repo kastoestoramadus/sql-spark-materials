@@ -1,0 +1,44 @@
+== Parsed Logical Plan ==
+'Aggregate ['o.o_id, 'o.amount], ['o.o_id, 'o.amount, 'SUM('i.qty) AS qty]
+'Join Inner, ('o.o_id = 'i.o_id)
+'SubqueryAlias o
+  +- 'UnresolvedRelation [orders], [], false
+'SubqueryAlias i
+  +- 'UnresolvedRelation [order_items], [], false
+== Analyzed Logical Plan ==
+Aggregate [o_id, amount], [o_id, amount, sum(qty) AS qty]
+Join Inner, (o_id = o_id)
+SubqueryAlias o
+  +- SubqueryAlias orders
+    +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+SubqueryAlias i
+  +- SubqueryAlias order_items
+    +- Relation order_items[oi_id,o_id,qty,price] parquet
+== Optimized Logical Plan ==
+Aggregate [o_id, amount], [o_id, amount, sum(qty) AS qty]
+Project [o_id, amount, qty]
+Join Inner, (o_id = o_id)
+  +- Project [o_id, amount]
+    +- Filter isnotnull(o_id)
+      +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+  +- Project [o_id, qty]
+    +- Filter isnotnull(o_id)
+      +- Relation order_items[oi_id,o_id,qty,price] parquet
+== Physical Plan ==
+[wcg]HashAggregate(keys=[o_id, amount], functions=[sum(qty)], output=[o_id, amount, qty])
+[wcg]HashAggregate(keys=[o_id, amount], functions=[partial_sum(qty)], output=[o_id, amount, sum])
+[wcg]Project [o_id, amount, qty]
+  +- [wcg]SortMergeJoin [o_id], [o_id], Inner
+    +- [wcg]Sort [o_id ASC NULLS FIRST], false, 0
+      +- Exchange hashpartitioning(o_id, 200), ENSURE_REQUIREMENTS
+        +- [wcg]Filter isnotnull(o_id)
+          +- [wcg]ColumnarToRow
+            +- FileScan parquet orders[o_id,amount] Batched: true, DataFilters: [isnotnull(o_id)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(o_id)], ReadSchema: <elided>
+    +- [wcg]Sort [o_id ASC NULLS FIRST], false, 0
+      +- Exchange hashpartitioning(o_id, 200), ENSURE_REQUIREMENTS
+        +- [wcg]Filter isnotnull(o_id)
+          +- [wcg]ColumnarToRow
+            +- FileScan parquet order_items[o_id,qty] Batched: true, DataFilters: [isnotnull(o_id)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(o_id)], ReadSchema: <elided>
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=617]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=626]

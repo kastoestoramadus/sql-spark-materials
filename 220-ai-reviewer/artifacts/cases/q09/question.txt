@@ -1,0 +1,3 @@
+Find the defect in this query (correctness or serious performance problem).
+
+SELECT o.region, COUNT(DISTINCT o.customer_id) AS customers FROM orders o GROUP BY o.region

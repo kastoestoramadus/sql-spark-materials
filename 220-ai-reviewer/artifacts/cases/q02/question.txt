@@ -1,0 +1,3 @@
+Find the defect in this query (correctness or serious performance problem).
+
+SELECT o.o_id, t.t_id, o.amount FROM orders o LEFT JOIN support_tickets t ON o.customer_id = t.customer_id WHERE t.priority = 'HIGH'

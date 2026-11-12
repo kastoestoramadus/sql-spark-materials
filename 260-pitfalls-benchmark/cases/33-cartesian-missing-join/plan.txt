@@ -1,0 +1,44 @@
+== Parsed Logical Plan ==
+'Project [unresolvedalias('COUNT(1))]
++- 'Filter ('a.grp = 1)
+   +- 'Join Inner
+      :- 'SubqueryAlias a
+      :  +- 'UnresolvedRelation [q33a], [], false
+      +- 'SubqueryAlias b
+         +- 'UnresolvedRelation [q33b], [], false
+== Analyzed Logical Plan ==
+count(1): bigint
+Aggregate [count(1) AS count(1)#1100L]
++- Filter (grp#1093L = cast(1 as bigint))
+   +- Join Inner
+      :- SubqueryAlias a
+      :  +- SubqueryAlias q33a
+      :     +- View (`q33a`, [id#1092L, grp#1093L])
+      :        +- Project [cast(id#1094L as bigint) AS id#1092L, cast(grp#1091L as bigint) AS grp#1093L]
+      :           +- Project [id#1094L, (id#1094L % cast(7 as bigint)) AS grp#1091L]
+      :              +- Range (0, 100, step=1)
+      +- SubqueryAlias b
+         +- SubqueryAlias q33b
+            +- View (`q33b`, [id#1096L, nm#1097])
+               +- Project [cast(id#1098L as bigint) AS id#1096L, cast(nm#1095 as string) AS nm#1097]
+                  +- Project [id#1098L, concat(n, cast(id#1098L as string)) AS nm#1095]
+                     +- Range (0, 100, step=1)
+== Optimized Logical Plan ==
+Aggregate [count(1) AS count(1)#1100L]
++- Join Inner
+   :- Project
+   :  +- Filter ((id#1094L % 7) = 1)
+   :     +- Range (0, 100, step=1)
+   +- Project
+      +- Range (0, 100, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(1)], output=[count(1)#1100L])
+   +- HashAggregate(keys=[], functions=[partial_count(1)], output=[count#1102L])
+      +- BroadcastNestedLoopJoin BuildRight, Inner
+         :- Project
+         :  +- Filter ((id#1094L % 7) = 1)
+         :     +- Range (0, 100, step=1, splits=1)
+         +- BroadcastExchange IdentityBroadcastMode, [plan_id=4069]
+            +- Project
+               +- Range (0, 100, step=1, splits=1)

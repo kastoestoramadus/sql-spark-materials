@@ -1,0 +1,27 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=region, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Column(
+      this=Identifier(this=customer_id, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Alias(
+      this=Sum(
+        this=Column(
+          this=Identifier(this=amount, quoted=False),
+          table=Identifier(this=o, quoted=False))),
+      alias=Identifier(this=total, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  group=Group(
+    expressions=[
+      Column(
+        this=Identifier(this=region, quoted=False),
+        table=Identifier(this=o, quoted=False)),
+      Column(
+        this=Identifier(this=customer_id, quoted=False),
+        table=Identifier(this=o, quoted=False))]))

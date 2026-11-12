@@ -1,0 +1,29 @@
+== Physical Plan ==
+Window (5)
++- * Sort (4)
+   +- Exchange (3)
+      +- * ColumnarToRow (2)
+         +- Scan parquet spark_catalog.default.orders (1)
+
+
+(1) Scan parquet spark_catalog.default.orders
+Output [2]: [o_id#140L, amount#145]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/orders]
+ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+
+(2) ColumnarToRow [codegen id : 1]
+Input [2]: [o_id#140L, amount#145]
+
+(3) Exchange
+Input [2]: [o_id#140L, amount#145]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=672]
+
+(4) Sort [codegen id : 2]
+Input [2]: [o_id#140L, amount#145]
+Arguments: [amount#145 DESC NULLS LAST], false, 0
+
+(5) Window
+Input [2]: [o_id#140L, amount#145]
+Arguments: [row_number() windowspecdefinition(amount#145 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rn#205], [amount#145 DESC NULLS LAST]
+

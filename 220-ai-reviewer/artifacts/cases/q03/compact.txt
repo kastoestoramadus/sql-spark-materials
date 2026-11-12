@@ -1,0 +1,32 @@
+== Parsed Logical Plan ==
+'Project ['c.customer_id, 'c.name]
+'Filter NOT 'c.customer_id IN (list [])
+  +- 'Project ['customer_id]
+    +- 'UnresolvedRelation [support_tickets], [], false
+'SubqueryAlias c
+  +- 'UnresolvedRelation [customers], [], false
+== Analyzed Logical Plan ==
+Project [customer_id, name]
+Filter NOT customer_id IN (list [])
+  +- Project [customer_id]
+    +- SubqueryAlias support_tickets
+      +- Relation support_tickets[t_id,customer_id,priority] parquet
+SubqueryAlias c
+  +- SubqueryAlias customers
+    +- Relation customers[customer_id,name,country,segment] parquet
+== Optimized Logical Plan ==
+Join LeftAnti, ((customer_id = customer_id) OR isnull((customer_id = customer_id)))
+Project [customer_id, name]
+Relation customers[customer_id,name,country,segment] parquet
+Project [customer_id]
+Relation support_tickets[t_id,customer_id,priority] parquet
+== Physical Plan ==
+[wcg]BroadcastHashJoin [customer_id], [customer_id], LeftAnti, BuildRight, true
+[wcg]ColumnarToRow
+FileScan parquet customers[customer_id,name] Batched: true, DataFilters: [], Format: Parquet, Location: <paths elided>, PushedFilters: [], ReadSchema: <elided>
+BroadcastExchange HashedRelationBroadcastMode(List(input[0, bigint, true]),true)
+[wcg]ColumnarToRow
+  +- FileScan parquet support_tickets[customer_id] Batched: true, DataFilters: [], Format: Parquet, Location: <paths elided>, PushedFilters: [], ReadSchema: <elided>
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Optimized Logical Plan: anti/semi join - NULL semantics matter -> Join LeftAnti, ((customer_id#147L = customer_id#152L) OR isnull((customer_id#147L = custom
+  WARN: Physical Plan: anti/semi join - NULL semantics matter -> BroadcastHashJoin [customer_id#147L], [customer_id#152L], LeftAnti, BuildRight, true

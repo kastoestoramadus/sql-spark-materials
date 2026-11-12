@@ -1,0 +1,23 @@
+# UNTESTED (written 2026-10-18; Docker daemon was down in preflight).
+# Spark History Server (official image, tag verified on hub.docker.com 2026-10-18)
+# with the DataFlint OSS plugin added to the history server UI.
+# Windows note: run from PowerShell, no WSL required by the container itself;
+# mount the event-log folder as a plain Windows path bind mount.
+FROM apache/spark:3.5.9-scala2.12-java17-python3-ubuntu
+
+USER root
+# jar fetched at build time (needs Maven Central during build; for offline banks
+# pre-download and COPY it instead, as in Dockerfile.analysers)
+ADD https://repo1.maven.org/maven2/io/dataflint/spark_2.12/0.9.9/spark_2.12-0.9.9.jar /opt/spark/jars/dataflint.jar
+
+ENV SPARK_NO_DAEMONIZE=1
+EXPOSE 18080
+
+# point the history server at the mounted event-log dir and enable the DataFlint tab
+CMD ["/opt/spark/sbin/start-history-server.sh", \
+     "--properties-file", "/opt/spark/conf/spark-history.properties"]
+
+# spark-history.properties (bake or mount) must contain:
+#   spark.history.fs.logDirectory=file:///mnt/spark-events
+#   spark.history.ui.port=18080
+#   spark.plugins=io.dataflint.spark.SparkDataflintPlugin

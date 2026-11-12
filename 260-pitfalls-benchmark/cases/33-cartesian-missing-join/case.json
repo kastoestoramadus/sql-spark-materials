@@ -1,0 +1,21 @@
+{
+ "n": "33",
+ "name": "cartesian-missing-join",
+ "difficulty": "easy",
+ "category": "cost",
+ "pitfall": "033",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "cartesian",
+  "missing join condition",
+  "row count multiplies"
+ ],
+ "non_defects": [
+  "filtering grp=1 first is a valid optimisation, not the defect"
+ ],
+ "df_variants": []
+}

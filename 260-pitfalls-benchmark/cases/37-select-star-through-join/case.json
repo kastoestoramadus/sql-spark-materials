@@ -1,0 +1,25 @@
+{
+ "n": "37",
+ "name": "select-star-through-join",
+ "difficulty": "hard",
+ "category": "cost",
+ "pitfall": "-",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "SELECT * through a shuffle join",
+  "unused wide columns carried into the join",
+  "column pruning defeated"
+ ],
+ "non_defects": [
+  "the join on d is correct",
+  "USING/ON style is a style choice, not the defect"
+ ],
+ "df_variants": [
+  "sum(1 for l in spark.sql('SELECT * FROM q37 JOIN q37dim USING (d)')._jdf.queryExecution().executedPlan().toString().splitlines() if 'payload_j' in l)",
+  "sum(1 for l in spark.sql('SELECT q37.k, q37dim.tier FROM q37 JOIN q37dim ON q37.d = q37dim.d')._jdf.queryExecution().executedPlan().toString().splitlines() if 'payload_j' in l)"
+ ]
+}

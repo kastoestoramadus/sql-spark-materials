@@ -1,0 +1,28 @@
+{
+ "n": "24",
+ "name": "ansi-default-upgrade-flip",
+ "difficulty": "hard",
+ "category": "maintainability",
+ "pitfall": "024",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "behavior differs between Spark 3 and Spark 4 for the same query",
+  "ANSI default flipped in Spark 4",
+  "unguarded cast on dirty codes",
+  "spark.sql.ansi.enabled decides between NULL and exception"
+ ],
+ "non_defects": [
+  "pure-digit codes cast fine",
+  "try_cast returning NULL for '12x' is the intended policy"
+ ],
+ "df_variants": [
+  "spark.conf.set('spark.sql.ansi.enabled','false')",
+  "spark.sql('SELECT CAST(code AS INT) FROM q24').collect()",
+  "spark.sql('SELECT try_cast(code AS INT) FROM q24').collect()",
+  "spark.conf.set('spark.sql.ansi.enabled','true')"
+ ]
+}

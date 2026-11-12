@@ -1,0 +1,13 @@
+cid	defect	where visible (expected)
+q01	second join has no equi-condition -> cartesian product with 30k support_tickets; any HIGH priority row matches every order	plan (CartesianProduct/BroadcastNestedLoopJoin)
+q02	LEFT JOIN defeated: WHERE t.priority='HIGH' rejects NULL right side, silently an INNER JOIN; customers without tickets disappear	SQL semantics; optimized plan shows IsNotNull+Inner conversion
+q03	NOT IN over nullable customer_id -> predicate is NULL for all rows -> empty result	SQL semantics; plan shows LeftAnti with null-aware condition
+q04	status != 'CANCELLED' drops NULL status rows (~1/97) from revenue	SQL semantics only (NULL-aware anti not in plan)
+q05	data skew: 80% of orders have region EU -> one task gets ~80% of rows after shuffle	NOT visible in SQL or static plan; needs runtime metrics/event log
+q06	join+group on same key causes extra shuffle... actual: no defect beyond SMJ-by-config; expected finding: SMJ where both sides small; reviewer sees statistics	plan (SortMergeJoin + row counts)
+q07	row_number() OVER (ORDER BY ...) without PARTITION BY -> all 50k rows in one partition/task	plan (Window with no partition spec -> single partition)
+q08	order_ts is 'yyyy-MM-dd' but parsed as 'MM/dd/yyyy' -> to_date NULL -> empty result	SQL semantics (needs schema/format knowledge)
+q09	COUNT(DISTINCT customer_id) skips NULL customer_ids (none here) -> actually fine; trap: reviewer overflags; key: no defect, control case	control case
+q10	double join to order_items multiplies rows: SUM(o.amount) counts each order 6x (6 items/order squared=36x)	SQL semantics; plan shows two joins causing fanout before aggregate
+q11	amount*1.23 on DECIMAL -> precision growth fine; control: no real defect; expected: reviewer should NOT flag (false-positive probe)	control case
+q12	200 shuffle partitions for ~50k rows -> tiny tasks, overhead; plan shows Exchange hashpartitioning(200)	plan (Exchange numPartitions=200)

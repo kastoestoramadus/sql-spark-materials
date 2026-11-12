@@ -1,0 +1,106 @@
+== Physical Plan ==
+* HashAggregate (18)
++- * HashAggregate (17)
+   +- * Project (16)
+      +- * SortMergeJoin Inner (15)
+         :- * Project (12)
+         :  +- * SortMergeJoin Inner (11)
+         :     :- * Sort (5)
+         :     :  +- Exchange (4)
+         :     :     +- * Filter (3)
+         :     :        +- * ColumnarToRow (2)
+         :     :           +- Scan parquet spark_catalog.default.orders (1)
+         :     +- * Sort (10)
+         :        +- Exchange (9)
+         :           +- * Filter (8)
+         :              +- * ColumnarToRow (7)
+         :                 +- Scan parquet spark_catalog.default.order_items (6)
+         +- * Sort (14)
+            +- ReusedExchange (13)
+
+
+(1) Scan parquet spark_catalog.default.orders
+Output [2]: [o_id#140L, amount#145]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/orders]
+PushedFilters: [IsNotNull(o_id)]
+ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+
+(2) ColumnarToRow [codegen id : 1]
+Input [2]: [o_id#140L, amount#145]
+
+(3) Filter [codegen id : 1]
+Input [2]: [o_id#140L, amount#145]
+Condition : isnotnull(o_id#140L)
+
+(4) Exchange
+Input [2]: [o_id#140L, amount#145]
+Arguments: hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=844]
+
+(5) Sort [codegen id : 2]
+Input [2]: [o_id#140L, amount#145]
+Arguments: [o_id#140L ASC NULLS FIRST], false, 0
+
+(6) Scan parquet spark_catalog.default.order_items
+Output [1]: [o_id#195L]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/order_items]
+PushedFilters: [IsNotNull(o_id)]
+ReadSchema: struct<o_id:bigint>
+
+(7) ColumnarToRow [codegen id : 3]
+Input [1]: [o_id#195L]
+
+(8) Filter [codegen id : 3]
+Input [1]: [o_id#195L]
+Condition : isnotnull(o_id#195L)
+
+(9) Exchange
+Input [1]: [o_id#195L]
+Arguments: hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=853]
+
+(10) Sort [codegen id : 4]
+Input [1]: [o_id#195L]
+Arguments: [o_id#195L ASC NULLS FIRST], false, 0
+
+(11) SortMergeJoin [codegen id : 5]
+Left keys [1]: [o_id#140L]
+Right keys [1]: [o_id#195L]
+Join type: Inner
+Join condition: None
+
+(12) Project [codegen id : 5]
+Output [2]: [o_id#140L, amount#145]
+Input [3]: [o_id#140L, amount#145, o_id#195L]
+
+(13) ReusedExchange [Reuses operator id: 9]
+Output [1]: [o_id#223L]
+
+(14) Sort [codegen id : 7]
+Input [1]: [o_id#223L]
+Arguments: [o_id#223L ASC NULLS FIRST], false, 0
+
+(15) SortMergeJoin [codegen id : 8]
+Left keys [1]: [o_id#140L]
+Right keys [1]: [o_id#223L]
+Join type: Inner
+Join condition: None
+
+(16) Project [codegen id : 8]
+Output [2]: [o_id#140L, amount#145]
+Input [3]: [o_id#140L, amount#145, o_id#223L]
+
+(17) HashAggregate [codegen id : 8]
+Input [2]: [o_id#140L, amount#145]
+Keys [1]: [o_id#140L]
+Functions [1]: [partial_sum(amount#145)]
+Aggregate Attributes [2]: [sum#230, isEmpty#231]
+Results [3]: [o_id#140L, sum#232, isEmpty#233]
+
+(18) HashAggregate [codegen id : 8]
+Input [3]: [o_id#140L, sum#232, isEmpty#233]
+Keys [1]: [o_id#140L]
+Functions [1]: [sum(amount#145)]
+Aggregate Attributes [1]: [sum(amount#145)#226]
+Results [2]: [o_id#140L, sum(amount#145)#226 AS total#221]
+

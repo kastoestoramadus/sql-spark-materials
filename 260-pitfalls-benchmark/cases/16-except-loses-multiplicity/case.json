@@ -1,0 +1,22 @@
+{
+ "n": "16",
+ "name": "except-loses-multiplicity",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "016",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "EXCEPT DISTINCT",
+  "multiplicity or duplicates removed",
+  "set semantics"
+ ],
+ "non_defects": [
+  "value 2 being removed is correct",
+  "INTERSECT is not involved"
+ ],
+ "df_variants": []
+}

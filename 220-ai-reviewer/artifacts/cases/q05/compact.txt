@@ -1,0 +1,45 @@
+== Parsed Logical Plan ==
+'Aggregate ['d.region_name], ['d.region_name, 'COUNT(1) AS n, 'SUM('o.amount) AS total]
+'Join Inner, ('o.region = 'd.region_code)
+'SubqueryAlias o
+  +- 'UnresolvedRelation [orders], [], false
+'SubqueryAlias d
+  +- 'UnresolvedRelation [dim_regions], [], false
+== Analyzed Logical Plan ==
+Aggregate [region_name], [region_name, count(1) AS n, sum(amount) AS total]
+Join Inner, (region = region_code)
+SubqueryAlias o
+  +- SubqueryAlias orders
+    +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+SubqueryAlias d
+  +- SubqueryAlias dim_regions
+    +- Relation dim_regions[region_code,region_name] parquet
+== Optimized Logical Plan ==
+Aggregate [region_name], [region_name, count(1) AS n, sum(amount) AS total]
+Project [amount, region_name]
+Join Inner, (region = region_code)
+  +- Project [amount, region]
+    +- Filter isnotnull(region)
+      +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+  +- Filter isnotnull(region_code)
+    +- Relation dim_regions[region_code,region_name] parquet
+== Physical Plan ==
+[wcg]HashAggregate(keys=[region_name], functions=[count(1), sum(amount)], output=[region_name, n, total])
+Exchange hashpartitioning(region_name, 200), ENSURE_REQUIREMENTS
+[wcg]HashAggregate(keys=[region_name], functions=[partial_count(1), partial_sum(amount)], output=[region_name, count, sum, isEmpty])
+  +- [wcg]Project [amount, region_name]
+    +- [wcg]SortMergeJoin [region], [region_code], Inner
+      +- [wcg]Sort [region ASC NULLS FIRST], false, 0
+        +- Exchange hashpartitioning(region, 200), ENSURE_REQUIREMENTS
+          +- [wcg]Filter isnotnull(region)
+            +- [wcg]ColumnarToRow
+              +- FileScan parquet orders[amount,region] Batched: true, DataFilters: [isnotnull(region)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(region)], ReadSchema: <elided>
+      +- [wcg]Sort [region_code ASC NULLS FIRST], false, 0
+        +- Exchange hashpartitioning(region_code, 200), ENSURE_REQUIREMENTS
+          +- [wcg]Filter isnotnull(region_code)
+            +- [wcg]ColumnarToRow
+              +- FileScan parquet dim_regions[region_code,region_name] Batched: true, DataFilters: [isnotnull(region_code)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(region_code)]
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region_name#179, 200), ENSURE_REQUIREMENTS, [plan_id=519]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=501]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region_code#178, 200), ENSURE_REQUIREMENTS, [plan_id=510]

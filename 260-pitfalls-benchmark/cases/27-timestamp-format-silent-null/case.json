@@ -1,0 +1,22 @@
+{
+ "n": "27",
+ "name": "timestamp-format-silent-null",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "027",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "wrong format pattern",
+  "to_timestamp returns NULL",
+  "no error raised"
+ ],
+ "non_defects": [
+  "the string itself is a valid timestamp in its real format",
+  "NULL semantics of the comparison are not the issue"
+ ],
+ "df_variants": []
+}

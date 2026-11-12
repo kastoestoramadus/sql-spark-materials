@@ -1,0 +1,18 @@
+== Parsed Logical Plan ==
+'Project ['o_id, 'amount, ('amount * 1.23) AS gross#234]
++- 'UnresolvedRelation [orders], [], false
+
+== Analyzed Logical Plan ==
+o_id: bigint, amount: decimal(10,2), gross: decimal(14,4)
+Project [o_id#140L, amount#145, (amount#145 * 1.23) AS gross#234]
++- SubqueryAlias spark_catalog.default.orders
+   +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+
+== Optimized Logical Plan ==
+Project [o_id#140L, amount#145, (amount#145 * 1.23) AS gross#234]
++- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+
+== Physical Plan ==
+*(1) Project [o_id#140L, amount#145, (amount#145 * 1.23) AS gross#234]
++- *(1) ColumnarToRow
+   +- FileScan parquet spark_catalog.default.orders[o_id#140L,amount#145] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>

@@ -1,0 +1,25 @@
+== Optimized Logical Plan ==
+Project [o_id#140L, t_id#151L, amount#145], Statistics(sizeInBytes=11.6 GiB)
++- Join Inner, (customer_id#141L = customer_id#152L), Statistics(sizeInBytes=17.4 GiB)
+   :- Project [o_id#140L, customer_id#141L, amount#145], Statistics(sizeInBytes=135.1 KiB)
+   :  +- Filter isnotnull(customer_id#141L), Statistics(sizeInBytes=405.2 KiB)
+   :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+   +- Project [t_id#151L, customer_id#152L], Statistics(sizeInBytes=131.6 KiB)
+      +- Filter ((isnotnull(priority#153) AND (priority#153 = HIGH)) AND isnotnull(customer_id#152L)), Statistics(sizeInBytes=241.2 KiB)
+         +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet, Statistics(sizeInBytes=241.2 KiB)
+
+== Physical Plan ==
+*(5) Project [o_id#140L, t_id#151L, amount#145]
++- *(5) SortMergeJoin [customer_id#141L], [customer_id#152L], Inner
+   :- *(2) Sort [customer_id#141L ASC NULLS FIRST], false, 0
+   :  +- Exchange hashpartitioning(customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_id=325]
+   :     +- *(1) Filter isnotnull(customer_id#141L)
+   :        +- *(1) ColumnarToRow
+   :           +- FileScan parquet spark_catalog.default.orders[o_id#140L,customer_id#141L,amount#145] Batched: true, DataFilters: [isnotnull(customer_id#141L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(customer_id)], ReadSchema: struct<o_id:bigint,customer_id:bigint,amount:decimal(10,2)>
+   +- *(4) Sort [customer_id#152L ASC NULLS FIRST], false, 0
+      +- Exchange hashpartitioning(customer_id#152L, 200), ENSURE_REQUIREMENTS, [plan_id=335]
+         +- *(3) Project [t_id#151L, customer_id#152L]
+            +- *(3) Filter ((isnotnull(priority#153) AND (priority#153 = HIGH)) AND isnotnull(customer_id#152L))
+               +- *(3) ColumnarToRow
+                  +- FileScan parquet spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] Batched: true, DataFilters: [isnotnull(priority#153), (priority#153 = HIGH), isnotnull(customer_id#152L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(priority), EqualTo(priority,HIGH), IsNotNull(customer_id)], ReadSchema: struct<t_id:bigint,customer_id:bigint,priority:string>
+

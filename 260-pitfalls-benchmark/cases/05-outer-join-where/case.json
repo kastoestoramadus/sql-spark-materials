@@ -1,0 +1,22 @@
+{
+ "n": "05",
+ "name": "outer-join-where",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "005",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "WHERE on right table",
+  "outer join became inner",
+  "unmatched rows lost"
+ ],
+ "non_defects": [
+  "putting the s.status filter into the ON clause is the fix, not a new bug",
+  "the LEFT keyword itself is fine"
+ ],
+ "df_variants": []
+}

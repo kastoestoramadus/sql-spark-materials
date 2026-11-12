@@ -1,0 +1,28 @@
+== Parsed Logical Plan ==
+'GlobalLimit 1
++- 'LocalLimit 1
+   +- 'Sort ['score DESC NULLS LAST], true
+      +- 'Project ['player]
+         +- 'UnresolvedRelation [q08], [], false
+== Analyzed Logical Plan ==
+player: string
+GlobalLimit 1
++- LocalLimit 1
+   +- Project [player#237]
+      +- Sort [score#238 DESC NULLS LAST], true
+         +- Project [player#237, score#238]
+            +- SubqueryAlias q08
+               +- View (`q08`, [player#237, score#238])
+                  +- Project [cast(player#235 as string) AS player#237, cast(score#236 as int) AS score#238]
+                     +- Project [player#235, score#236]
+                        +- SubqueryAlias t
+                           +- LocalRelation [player#235, score#236]
+== Optimized Logical Plan ==
+GlobalLimit 1
++- LocalLimit 1
+   +- Project [player#237]
+      +- Sort [score#238 DESC NULLS LAST], true
+         +- LocalRelation [player#237, score#238]
+== Physical Plan ==
+TakeOrderedAndProject(limit=1, orderBy=[score#238 DESC NULLS LAST], output=[player#237])
++- LocalTableScan [player#237, score#238]

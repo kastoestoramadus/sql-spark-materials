@@ -1,0 +1,15 @@
+== Optimized Logical Plan ==
+Join LeftAnti, ((customer_id#147L = customer_id#152L) OR isnull((customer_id#147L = customer_id#152L))), Statistics(sizeInBytes=42.3 KiB)
+:- Project [customer_id#147L, name#148], Statistics(sizeInBytes=42.3 KiB)
+:  +- Relation spark_catalog.default.customers[customer_id#147L,name#148,country#149,segment#150] parquet, Statistics(sizeInBytes=89.4 KiB)
++- Project [customer_id#152L], Statistics(sizeInBytes=87.7 KiB)
+   +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet, Statistics(sizeInBytes=241.2 KiB)
+
+== Physical Plan ==
+*(2) BroadcastHashJoin [customer_id#147L], [customer_id#152L], LeftAnti, BuildRight, true
+:- *(2) ColumnarToRow
+:  +- FileScan parquet spark_catalog.default.customers[customer_id#147L,name#148] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint,name:string>
++- BroadcastExchange HashedRelationBroadcastMode(List(input[0, bigint, true]),true), [plan_id=386]
+   +- *(1) ColumnarToRow
+      +- FileScan parquet spark_catalog.default.support_tickets[customer_id#152L] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint>
+

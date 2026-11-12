@@ -1,0 +1,22 @@
+{
+ "n": "11",
+ "name": "last-value-default-frame",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "011",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "default frame ends at current row",
+  "LAST_VALUE returns current value",
+  "UNBOUNDED FOLLOWING"
+ ],
+ "non_defects": [
+  "FIRST_VALUE would work by accident \u2014 not the right mental model",
+  "ORDER BY evt inside the window is fine"
+ ],
+ "df_variants": []
+}

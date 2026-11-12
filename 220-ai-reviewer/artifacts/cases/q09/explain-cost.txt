@@ -1,0 +1,15 @@
+== Optimized Logical Plan ==
+Aggregate [region#146], [region#146, count(distinct customer_id#141L) AS customers#212L], Statistics(sizeInBytes=151.9 KiB)
++- Project [customer_id#141L, region#146], Statistics(sizeInBytes=151.9 KiB)
+   +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+
+== Physical Plan ==
+*(3) HashAggregate(keys=[region#146], functions=[count(distinct customer_id#141L)], output=[region#146, customers#212L])
++- Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=735]
+   +- *(2) HashAggregate(keys=[region#146], functions=[partial_count(distinct customer_id#141L)], output=[region#146, count#218L])
+      +- *(2) HashAggregate(keys=[region#146, customer_id#141L], functions=[], output=[region#146, customer_id#141L])
+         +- Exchange hashpartitioning(region#146, customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_id=730]
+            +- *(1) HashAggregate(keys=[region#146, customer_id#141L], functions=[], output=[region#146, customer_id#141L])
+               +- *(1) ColumnarToRow
+                  +- FileScan parquet spark_catalog.default.orders[customer_id#141L,region#146] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint,region:string>
+

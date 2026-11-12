@@ -1,0 +1,22 @@
+{
+ "n": "01",
+ "name": "null-equality-filter",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "001",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "note = NULL",
+  "NULL comparison",
+  "UNKNOWN"
+ ],
+ "non_defects": [
+  "rows with id 1 and 3 are correctly excluded",
+  "IS NOT NULL"
+ ],
+ "df_variants": []
+}

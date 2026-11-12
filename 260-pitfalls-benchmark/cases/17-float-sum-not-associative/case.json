@@ -1,0 +1,24 @@
+{
+ "n": "17",
+ "name": "float-sum-not-associative",
+ "difficulty": "hard",
+ "category": "correctness",
+ "pitfall": "017",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "floating point",
+  "order of summation or partitioning",
+  "not associative"
+ ],
+ "non_defects": [
+  "DuckDB or another engine returning a different value is not a Spark bug \u2014 same non-associativity"
+ ],
+ "df_variants": [
+  "spark.table('q17').repartition(1).agg(F.sum('x')).collect()[0][0]",
+  "spark.table('q17').repartition(2).agg(F.sum('x')).collect()[0][0]"
+ ]
+}

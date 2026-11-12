@@ -1,0 +1,27 @@
+== Optimized Logical Plan ==
+Aggregate [region_name#179], [region_name#179, count(1) AS n#175L, sum(amount#145) AS total#176], Statistics(sizeInBytes=149.9 MiB)
++- Project [amount#145, region_name#179], Statistics(sizeInBytes=103.7 MiB)
+   +- Join Inner, (region#146 = region_code#178), Statistics(sizeInBytes=219.0 MiB)
+      :- Project [amount#145, region#146], Statistics(sizeInBytes=151.9 KiB)
+      :  +- Filter isnotnull(region#146), Statistics(sizeInBytes=405.2 KiB)
+      :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+      +- Filter isnotnull(region_code#178), Statistics(sizeInBytes=1476.0 B)
+         +- Relation spark_catalog.default.dim_regions[region_code#178,region_name#179] parquet, Statistics(sizeInBytes=1476.0 B)
+
+== Physical Plan ==
+*(6) HashAggregate(keys=[region_name#179], functions=[count(1), sum(amount#145)], output=[region_name#179, n#175L, total#176])
++- Exchange hashpartitioning(region_name#179, 200), ENSURE_REQUIREMENTS, [plan_id=519]
+   +- *(5) HashAggregate(keys=[region_name#179], functions=[partial_count(1), partial_sum(amount#145)], output=[region_name#179, count#188L, sum#189, isEmpty#190])
+      +- *(5) Project [amount#145, region_name#179]
+         +- *(5) SortMergeJoin [region#146], [region_code#178], Inner
+            :- *(2) Sort [region#146 ASC NULLS FIRST], false, 0
+            :  +- Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=501]
+            :     +- *(1) Filter isnotnull(region#146)
+            :        +- *(1) ColumnarToRow
+            :           +- FileScan parquet spark_catalog.default.orders[amount#145,region#146] Batched: true, DataFilters: [isnotnull(region#146)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(region)], ReadSchema: struct<amount:decimal(10,2),region:string>
+            +- *(4) Sort [region_code#178 ASC NULLS FIRST], false, 0
+               +- Exchange hashpartitioning(region_code#178, 200), ENSURE_REQUIREMENTS, [plan_id=510]
+                  +- *(3) Filter isnotnull(region_code#178)
+                     +- *(3) ColumnarToRow
+                        +- FileScan parquet spark_catalog.default.dim_regions[region_code#178,region_name#179] Batched: true, DataFilters: [isnotnull(region_code#178)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(region_code)], ReadSchema: struct<region_code:string,region_name:string>
+

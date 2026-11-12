@@ -1,0 +1,14 @@
+== Parsed Logical Plan ==
+'Project ['o_id, 'amount, ('amount * 1.23) AS gross]
+'UnresolvedRelation [orders], [], false
+== Analyzed Logical Plan ==
+Project [o_id, amount, (amount * 1.23) AS gross]
+SubqueryAlias orders
+Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Optimized Logical Plan ==
+Project [o_id, amount, (amount * 1.23) AS gross]
+Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Physical Plan ==
+[wcg]Project [o_id, amount, (amount * 1.23) AS gross]
+[wcg]ColumnarToRow
+FileScan parquet orders[o_id,amount] Batched: true, DataFilters: [], Format: Parquet, Location: <paths elided>, PushedFilters: [], ReadSchema: <elided>

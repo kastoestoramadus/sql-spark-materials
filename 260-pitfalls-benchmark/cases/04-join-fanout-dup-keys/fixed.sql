@@ -1,0 +1,1 @@
+SELECT SUM(amt) AS total FROM q04f WHERE acct IN (SELECT DISTINCT acct FROM q04d);

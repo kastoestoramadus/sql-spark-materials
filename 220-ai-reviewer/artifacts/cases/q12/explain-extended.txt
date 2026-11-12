@@ -1,0 +1,23 @@
+== Parsed Logical Plan ==
+'Aggregate ['o.region, 'o.customer_id], ['o.region, 'o.customer_id, 'SUM('o.amount) AS total#238]
++- 'SubqueryAlias o
+   +- 'UnresolvedRelation [orders], [], false
+
+== Analyzed Logical Plan ==
+region: string, customer_id: bigint, total: decimal(20,2)
+Aggregate [region#146, customer_id#141L], [region#146, customer_id#141L, sum(amount#145) AS total#238]
++- SubqueryAlias o
+   +- SubqueryAlias spark_catalog.default.orders
+      +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+
+== Optimized Logical Plan ==
+Aggregate [region#146, customer_id#141L], [region#146, customer_id#141L, sum(amount#145) AS total#238]
++- Project [customer_id#141L, amount#145, region#146]
+   +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+
+== Physical Plan ==
+*(2) HashAggregate(keys=[region#146, customer_id#141L], functions=[sum(amount#145)], output=[region#146, customer_id#141L, total#238])
++- Exchange hashpartitioning(region#146, customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_id=941]
+   +- *(1) HashAggregate(keys=[region#146, customer_id#141L], functions=[partial_sum(amount#145)], output=[region#146, customer_id#141L, sum#245, isEmpty#246])
+      +- *(1) ColumnarToRow
+         +- FileScan parquet spark_catalog.default.orders[customer_id#141L,amount#145,region#146] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint,amount:decimal(10,2),region:string>

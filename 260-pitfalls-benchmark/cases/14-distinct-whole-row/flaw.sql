@@ -1,0 +1,1 @@
+SELECT DISTINCT a, b FROM q14 ORDER BY a, b;

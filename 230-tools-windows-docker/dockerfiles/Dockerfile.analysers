@@ -1,0 +1,32 @@
+# UNTESTED (written 2026-10-18; the Windows Docker daemon was down in preflight,
+# so this file was never built). Target: Windows with Docker, NO WSL needed:
+# everything runs inside the Linux container; only a shared folder for event logs
+# crosses the boundary.
+FROM python:3.11-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-17-jre-headless procps \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV SPARK_VERSION=3.5 SPARK_LOCAL_DIRS=/tmp
+
+# pure-python SQL tools + sparkMeasure wrapper
+RUN pip install --no-cache-dir \
+    "pyspark==3.5.9" sqlglot sqlfluff sparkmeasure sqllineage
+
+# jars that the pip wheels do NOT ship (sparkMeasure needs its jar; Deequ optional).
+# For an offline bank: pre-download these three files on a connected machine into
+# ./jars/ next to this Dockerfile so the build needs no Maven access:
+#   https://repo1.maven.org/maven2/ch/cern/sparkmeasure/spark-measure_2.12/0.25/spark-measure_2.12-0.25.jar
+#   https://repo1.maven.org/maven2/io/dataflint/spark_2.12/0.9.9/spark_2.12-0.9.9.jar
+#   https://repo1.maven.org/maven2/com/amazon/deequ/deequ/2.0.21-spark-3.5/deequ-2.0.21-spark-3.5.jar
+# COPY jars/ /opt/jars/
+# ENV PYSPARK_SUBMIT_ARGS="--jars /opt/jars/spark-measure_2.12-0.25.jar,/opt/jars/spark_2.12-0.9.9.jar pyspark-shell"
+
+WORKDIR /work
+# synthetic-job scripts and queries are mounted or COPYed at build time:
+COPY synthetic-job/ /work/synthetic-job/
+
+# example: run the synthetic job with event logging to the shared volume
+CMD ["python", "/work/synthetic-job/synthetic_job.py", "/work"]

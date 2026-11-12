@@ -1,0 +1,1 @@
+SELECT SUM(ROUND(amt)) AS total FROM q19;

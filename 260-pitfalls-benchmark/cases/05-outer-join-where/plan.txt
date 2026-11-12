@@ -1,0 +1,39 @@
+== Parsed Logical Plan ==
+'Project ['o.id, 's.status]
++- 'Filter ('s.status = OPEN)
+   +- 'Join LeftOuter, ('o.sid = 's.sid)
+      :- 'SubqueryAlias o
+      :  +- 'UnresolvedRelation [q05o], [], false
+      +- 'SubqueryAlias s
+         +- 'UnresolvedRelation [q05s], [], false
+== Analyzed Logical Plan ==
+id: int, status: string
+Project [id#126, status#131]
++- Filter (status#131 = OPEN)
+   +- Join LeftOuter, (sid#127 = sid#130)
+      :- SubqueryAlias o
+      :  +- SubqueryAlias q05o
+      :     +- View (`q05o`, [id#126, sid#127])
+      :        +- Project [cast(id#124 as int) AS id#126, cast(sid#125 as int) AS sid#127]
+      :           +- Project [id#124, sid#125]
+      :              +- SubqueryAlias t
+      :                 +- LocalRelation [id#124, sid#125]
+      +- SubqueryAlias s
+         +- SubqueryAlias q05s
+            +- View (`q05s`, [sid#130, status#131])
+               +- Project [cast(sid#128 as int) AS sid#130, cast(status#129 as string) AS status#131]
+                  +- Project [sid#128, status#129]
+                     +- SubqueryAlias t
+                        +- LocalRelation [sid#128, status#129]
+== Optimized Logical Plan ==
+Project [id#126, status#131]
++- Join Inner, (sid#127 = sid#130)
+   :- LocalRelation [id#126, sid#127]
+   +- LocalRelation [sid#130, status#131]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [id#126, status#131]
+   +- BroadcastHashJoin [sid#127], [sid#130], Inner, BuildLeft, false, false
+      :- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[1, int, true] as bigint)),false), [plan_id=563]
+      :  +- LocalTableScan [id#126, sid#127]
+      +- LocalTableScan [sid#130, status#131]

@@ -1,0 +1,25 @@
+{
+ "n": "21",
+ "name": "divide-by-zero-no-guard",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "021",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "division without a zero guard",
+  "zero divisor possible per data"
+ ],
+ "non_defects": [
+  "returning NULL for the zero row is an acceptable policy once explicit",
+  "the 10/2 row is fine"
+ ],
+ "df_variants": [
+  "spark.conf.set('spark.sql.ansi.enabled','false')",
+  "spark.sql('SELECT n / d FROM q21').collect()",
+  "spark.conf.set('spark.sql.ansi.enabled','true')"
+ ]
+}

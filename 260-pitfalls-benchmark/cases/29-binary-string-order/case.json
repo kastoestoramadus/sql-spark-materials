@@ -1,0 +1,22 @@
+{
+ "n": "29",
+ "name": "binary-string-order",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "029",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "binary or codepoint ordering",
+  "uppercase sorts first",
+  "collation"
+ ],
+ "non_defects": [
+  "the three names are all valid data",
+  "LIMIT 1 here is legitimate because ORDER BY is total under a collation"
+ ],
+ "df_variants": []
+}

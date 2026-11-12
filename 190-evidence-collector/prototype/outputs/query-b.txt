@@ -1,0 +1,7 @@
+(b) provenance join for run wf_sales_daily--r1--a1
+  code_commit       cdd939f1254b6076182c260ebec87fa820ab4aa3
+  definition v1 hash 41bf43e93b80b4a4
+  exec 0 plan_hash 597a706060120483
+    read raw_sales: columns={'id': 'int', 'amount': 'double'} -> subset-of-current (pruned read) (catalog now v1)
+  exec 1 plan_hash 33d8dc78c2bf7528
+    read sales_summary: columns={} -> no-columns-read (catalog now v2)

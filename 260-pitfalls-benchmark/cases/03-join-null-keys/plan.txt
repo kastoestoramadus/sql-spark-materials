@@ -1,0 +1,37 @@
+== Parsed Logical Plan ==
+'Project ['a.v, 'b.w]
++- 'Join Inner, ('a.k = 'b.k)
+   :- 'SubqueryAlias a
+   :  +- 'UnresolvedRelation [q03a], [], false
+   +- 'SubqueryAlias b
+      +- 'UnresolvedRelation [q03b], [], false
+== Analyzed Logical Plan ==
+v: string, w: string
+Project [v#50, w#54]
++- Join Inner, (k#49 = k#53)
+   :- SubqueryAlias a
+   :  +- SubqueryAlias q03a
+   :     +- View (`q03a`, [k#49, v#50])
+   :        +- Project [cast(k#47 as int) AS k#49, cast(v#48 as string) AS v#50]
+   :           +- Project [k#47, v#48]
+   :              +- SubqueryAlias t
+   :                 +- LocalRelation [k#47, v#48]
+   +- SubqueryAlias b
+      +- SubqueryAlias q03b
+         +- View (`q03b`, [k#53, w#54])
+            +- Project [cast(k#51 as int) AS k#53, cast(w#52 as string) AS w#54]
+               +- Project [k#51, w#52]
+                  +- SubqueryAlias t
+                     +- LocalRelation [k#51, w#52]
+== Optimized Logical Plan ==
+Project [v#50, w#54]
++- Join Inner, (k#49 = k#53)
+   :- LocalRelation [k#49, v#50]
+   +- LocalRelation [k#53, w#54]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Project [v#50, w#54]
+   +- BroadcastHashJoin [k#49], [k#53], Inner, BuildRight, false, false
+      :- LocalTableScan [k#49, v#50]
+      +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=136]
+         +- LocalTableScan [k#53, w#54]

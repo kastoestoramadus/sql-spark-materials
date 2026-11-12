@@ -1,0 +1,22 @@
+{
+ "n": "03",
+ "name": "join-null-keys",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "003",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "NULL join key",
+  "rows dropped",
+  "null-safe equality or <=>"
+ ],
+ "non_defects": [
+  "row (1,'a') matching is correct",
+  "an INNER join itself is not the defect"
+ ],
+ "df_variants": []
+}

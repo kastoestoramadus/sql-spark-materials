@@ -1,0 +1,25 @@
+{
+ "n": "40",
+ "name": "collect-to-driver",
+ "difficulty": "hard",
+ "category": "cost",
+ "pitfall": "-",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "collect() pulls all rows to the driver",
+  "aggregation done in Python instead of the engine",
+  "driver memory and serialization cost"
+ ],
+ "non_defects": [
+  "summing id is a fine goal",
+  "100k rows is not the issue at this scale - the pattern is"
+ ],
+ "df_variants": [
+  "(lambda t0: (len(spark.table('q40').collect()), round((__import__('time').time() - t0) * 1000)))(__import__('time').time())",
+  "(lambda t0: (spark.table('q40').agg(F.sum('id')).collect(), round((__import__('time').time() - t0) * 1000)))(__import__('time').time())"
+ ]
+}

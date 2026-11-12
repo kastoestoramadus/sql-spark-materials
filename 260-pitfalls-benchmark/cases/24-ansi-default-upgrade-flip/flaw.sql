@@ -1,0 +1,1 @@
+SELECT CAST(code AS INT) FROM q24;

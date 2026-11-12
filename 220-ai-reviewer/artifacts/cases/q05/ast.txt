@@ -1,0 +1,39 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=region_name, quoted=False),
+      table=Identifier(this=d, quoted=False)),
+    Alias(
+      this=Count(
+        this=Star(),
+        big_int=True),
+      alias=Identifier(this=n, quoted=False)),
+    Alias(
+      this=Sum(
+        this=Column(
+          this=Identifier(this=amount, quoted=False),
+          table=Identifier(this=o, quoted=False))),
+      alias=Identifier(this=total, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  joins=[
+    Join(
+      this=Table(
+        this=Identifier(this=dim_regions, quoted=False),
+        alias=TableAlias(
+          this=Identifier(this=d, quoted=False))),
+      on=EQ(
+        this=Column(
+          this=Identifier(this=region, quoted=False),
+          table=Identifier(this=o, quoted=False)),
+        expression=Column(
+          this=Identifier(this=region_code, quoted=False),
+          table=Identifier(this=d, quoted=False))))],
+  group=Group(
+    expressions=[
+      Column(
+        this=Identifier(this=region_name, quoted=False),
+        table=Identifier(this=d, quoted=False))]))

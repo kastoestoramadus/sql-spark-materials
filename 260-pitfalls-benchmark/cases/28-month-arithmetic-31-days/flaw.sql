@@ -1,0 +1,1 @@
+SELECT d + INTERVAL 31 DAYS AS next_month FROM q28;

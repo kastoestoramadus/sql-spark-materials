@@ -1,0 +1,27 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=customer_id, quoted=False),
+      table=Identifier(this=c, quoted=False)),
+    Column(
+      this=Identifier(this=name, quoted=False),
+      table=Identifier(this=c, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=customers, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=c, quoted=False)))),
+  where=Where(
+    this=Not(
+      this=In(
+        this=Column(
+          this=Identifier(this=customer_id, quoted=False),
+          table=Identifier(this=c, quoted=False)),
+        query=Subquery(
+          this=Select(
+            expressions=[
+              Column(
+                this=Identifier(this=customer_id, quoted=False))],
+            from_=From(
+              this=Table(
+                this=Identifier(this=support_tickets, quoted=False)))))))))

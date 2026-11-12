@@ -1,0 +1,28 @@
+== Parsed Logical Plan ==
+'Sort ['a ASC NULLS FIRST, 'b ASC NULLS FIRST], true
++- 'Distinct
+   +- 'Project ['a, 'b]
+      +- 'UnresolvedRelation [q14], [], false
+== Analyzed Logical Plan ==
+a: int, b: string
+Sort [a#546 ASC NULLS FIRST, b#547 ASC NULLS FIRST], true
++- Distinct
+   +- Project [a#546, b#547]
+      +- SubqueryAlias q14
+         +- View (`q14`, [a#546, b#547])
+            +- Project [cast(a#544 as int) AS a#546, cast(b#545 as string) AS b#547]
+               +- Project [a#544, b#545]
+                  +- SubqueryAlias t
+                     +- LocalRelation [a#544, b#545]
+== Optimized Logical Plan ==
+Sort [a#546 ASC NULLS FIRST, b#547 ASC NULLS FIRST], true
++- Aggregate [a#546, b#547], [a#546, b#547]
+   +- LocalRelation [a#546, b#547]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [a#546 ASC NULLS FIRST, b#547 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(a#546 ASC NULLS FIRST, b#547 ASC NULLS FIRST, 4), ENSURE_REQUIREMENTS, [plan_id=2005]
+      +- HashAggregate(keys=[a#546, b#547], functions=[], output=[a#546, b#547])
+         +- Exchange hashpartitioning(a#546, b#547, 4), ENSURE_REQUIREMENTS, [plan_id=2002]
+            +- HashAggregate(keys=[a#546, b#547], functions=[], output=[a#546, b#547])
+               +- LocalTableScan [a#546, b#547]

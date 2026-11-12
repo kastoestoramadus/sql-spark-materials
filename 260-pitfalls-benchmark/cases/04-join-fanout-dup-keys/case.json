@@ -1,0 +1,22 @@
+{
+ "n": "04",
+ "name": "join-fanout-dup-keys",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "004",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "duplicate key",
+  "fan-out",
+  "SUM inflated or double count"
+ ],
+ "non_defects": [
+  "the fact table rows themselves are unique",
+  "GROUP BY acct alone would not fix it"
+ ],
+ "df_variants": []
+}

@@ -1,0 +1,22 @@
+{
+ "n": "15",
+ "name": "union-dedup-hides-duplicates",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "015",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "UNION without ALL",
+  "implicit DISTINCT",
+  "duplicates removed"
+ ],
+ "non_defects": [
+  "the individual id values are correct",
+  "UNION ALL being cheaper is a bonus, not the defect"
+ ],
+ "df_variants": []
+}

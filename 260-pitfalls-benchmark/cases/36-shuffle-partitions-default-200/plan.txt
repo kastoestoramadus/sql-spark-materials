@@ -1,0 +1,22 @@
+== Parsed Logical Plan ==
+'Aggregate ['k], ['k, unresolvedalias('count(1)), unresolvedalias('max('pad))]
++- 'UnresolvedRelation [q36], [], false
+== Analyzed Logical Plan ==
+k: bigint, count(1): bigint, max(pad): string
+Aggregate [k#1173L], [k#1173L, count(1) AS count(1)#1178L, max(pad#1174) AS max(pad)#1179]
++- SubqueryAlias q36
+   +- View (`q36`, [id#1172L, k#1173L, pad#1174])
+      +- Project [cast(id#1175L as bigint) AS id#1172L, cast(k#1170L as bigint) AS k#1173L, cast(pad#1171 as string) AS pad#1174]
+         +- Project [id#1175L, (id#1175L % cast(50 as bigint)) AS k#1170L, lpad(cast(id#1175L as string), 60, x) AS pad#1171]
+            +- Range (0, 10000, step=1)
+== Optimized Logical Plan ==
+Aggregate [k#1173L], [k#1173L, count(1) AS count(1)#1178L, max(pad#1174) AS max(pad)#1179]
++- Project [(id#1175L % 50) AS k#1173L, lpad(cast(id#1175L as string), 60, x) AS pad#1174]
+   +- Range (0, 10000, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- SortAggregate(key=[k#1173L], functions=[count(1), max(pad#1174)], output=[k#1173L, count(1)#1178L, max(pad)#1179])
+   +- SortAggregate(key=[k#1173L], functions=[partial_count(1), partial_max(pad#1174)], output=[k#1173L, count#1182L, max#1183])
+      +- Sort [k#1173L ASC NULLS FIRST], false, 0
+         +- Project [(id#1175L % 50) AS k#1173L, lpad(cast(id#1175L as string), 60, x) AS pad#1174]
+            +- Range (0, 10000, step=1, splits=1)

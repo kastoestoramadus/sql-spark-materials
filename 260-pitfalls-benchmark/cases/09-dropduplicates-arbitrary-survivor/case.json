@@ -1,0 +1,25 @@
+{
+ "n": "09",
+ "name": "dropduplicates-arbitrary-survivor",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "009",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "dropDuplicates keeps an arbitrary row",
+  "which duplicate survives is not defined",
+  "no ordering rule"
+ ],
+ "non_defects": [
+  "keeping one row per id is the goal itself",
+  "repartition(1) in the variants only exposes the order dependence"
+ ],
+ "df_variants": [
+  "spark.table('q09').repartition(1).sortWithinPartitions('ts').dropDuplicates(['id']).orderBy('id').collect()",
+  "spark.table('q09').repartition(1).sortWithinPartitions(F.desc('ts')).dropDuplicates(['id']).orderBy('id').collect()"
+ ]
+}

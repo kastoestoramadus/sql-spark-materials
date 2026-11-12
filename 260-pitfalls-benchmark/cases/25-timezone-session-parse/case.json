@@ -1,0 +1,24 @@
+{
+ "n": "25",
+ "name": "timezone-session-parse",
+ "difficulty": "hard",
+ "category": "correctness",
+ "pitfall": "025",
+ "variants": [
+  {
+   "tz": "UTC"
+  },
+  {
+   "tz": "America/New_York"
+  }
+ ],
+ "required_findings": [
+  "session time zone",
+  "to_timestamp without zone",
+  "epoch differs"
+ ],
+ "non_defects": [
+  "the cutoff being an epoch number is fine; only the parsing side is ambiguous"
+ ],
+ "df_variants": []
+}

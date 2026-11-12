@@ -1,0 +1,18 @@
+== Parsed Logical Plan ==
+'Project ['fruit]
++- 'Filter 'fruit LIKE a%
+   +- 'UnresolvedRelation [q35], [], false
+== Analyzed Logical Plan ==
+fruit: string
+Project [fruit#1158]
++- Filter fruit#1158 LIKE a%
+   +- SubqueryAlias q35
+      +- View (`q35`, [fruit#1158])
+         +- Project [cast(fruit#1157 as string) AS fruit#1158]
+            +- Project [fruit#1157]
+               +- SubqueryAlias t
+                  +- LocalRelation [fruit#1157]
+== Optimized Logical Plan ==
+LocalRelation [fruit#1158]
+== Physical Plan ==
+LocalTableScan [fruit#1158]

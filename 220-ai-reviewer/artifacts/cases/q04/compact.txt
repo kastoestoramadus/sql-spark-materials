@@ -1,0 +1,26 @@
+== Parsed Logical Plan ==
+'Aggregate ['o.region], ['o.region, 'SUM('o.amount) AS revenue]
+'Filter NOT ('o.status = CANCELLED)
+'SubqueryAlias o
+  +- 'UnresolvedRelation [orders], [], false
+== Analyzed Logical Plan ==
+Aggregate [region], [region, sum(amount) AS revenue]
+Filter NOT (status = CANCELLED)
+SubqueryAlias o
+  +- SubqueryAlias orders
+    +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Optimized Logical Plan ==
+Aggregate [region], [region, sum(amount) AS revenue]
+Project [amount, region]
+Filter (isnotnull(status) AND NOT (status = CANCELLED))
+  +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Physical Plan ==
+[wcg]HashAggregate(keys=[region], functions=[sum(amount)], output=[region, revenue])
+Exchange hashpartitioning(region, 200), ENSURE_REQUIREMENTS
+[wcg]HashAggregate(keys=[region], functions=[partial_sum(amount)], output=[region, sum, isEmpty])
+  +- [wcg]Project [amount, region]
+    +- [wcg]Filter (isnotnull(status) AND NOT (status = CANCELLED))
+      +- [wcg]ColumnarToRow
+        +- FileScan parquet orders[status,amount,region] Batched: true, DataFilters: [isnotnull(status), NOT (status = CANCELLED)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=423]

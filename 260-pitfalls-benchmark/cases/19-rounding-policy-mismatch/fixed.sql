@@ -1,0 +1,1 @@
+SELECT SUM(BROUND(amt)) AS total FROM q19;

@@ -1,0 +1,21 @@
+{
+ "n": "12",
+ "name": "rank-pagination",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "012",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "RANK",
+  "ties",
+  "gap or position"
+ ],
+ "non_defects": [
+  "ROW_NUMBER would give exactly 2 rows but loses tie information \u2014 a policy choice, not a defect"
+ ],
+ "df_variants": []
+}

@@ -1,0 +1,27 @@
+{
+ "n": "13",
+ "name": "unseeded-rand-two-actions",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "013",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "unseeded rand()",
+  "nondeterministic filter",
+  "not reproducible across runs"
+ ],
+ "non_defects": [
+  "sampling ~50% of rows is a legitimate goal",
+  "rand(42) in fixed.sql is the correct pattern"
+ ],
+ "df_variants": [
+  "spark.sql('SELECT count(*) FROM q13 WHERE rand() < 0.5').collect()",
+  "spark.sql('SELECT count(*) FROM q13 WHERE rand() < 0.5').collect()",
+  "spark.sql('SELECT count(*) FROM q13 WHERE rand(42) < 0.5').collect()",
+  "spark.sql('SELECT count(*) FROM q13 WHERE rand(42) < 0.5').collect()"
+ ]
+}

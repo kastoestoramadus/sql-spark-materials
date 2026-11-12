@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL/Spark i big data — przegląd wszystkiego, co zrobiliśmy</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--muted:#666;--card:#f5f5f5;--line:#ddd;--accent:#0b5394;--warn:#8a5300;--ok:#1e6b34}
+@media(prefers-color-scheme:dark){:root{--bg:#14161a;--fg:#e6e6e6;--muted:#9a9a9a;--card:#1e2126;--line:#33363c;--accent:#7fb3ff;--warn:#e0a84e;--ok:#7fd49a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:46rem;margin:0 auto;padding:1rem 1rem 4rem}
+h1{font-size:1.45rem;line-height:1.25;margin:.5rem 0}h2{font-size:1.15rem;border-bottom:2px solid var(--line);padding-bottom:.3rem;margin-top:2rem}
+p,li{overflow-wrap:break-word}
+a{color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:.85rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.35rem .5rem;text-align:left;vertical-align:top}
+th{background:var(--card)}
+code{font-size:.8em;background:var(--card);padding:.1em .3em;border-radius:3px;overflow-wrap:anywhere}
+blockquote{margin:.5rem 0;padding:.4rem .8rem;border-left:3px solid var(--accent);background:var(--card)}
+.still{color:var(--ok)}.changed{color:var(--warn)}.esc{color:#c0392b;font-weight:600}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:0 .5em;font-size:.75rem;margin:0 .2rem .2rem 0;white-space:nowrap}
+footer{color:var(--muted);font-size:.8rem;margin-top:2.5rem;border-top:1px solid var(--line);padding-top:.6rem}
+.small{font-size:.8rem;color:var(--muted)}
+details{margin:.4rem 0}summary{cursor:pointer;font-weight:600}
+</style>
+</head>
+<body><main>
+<h1>SQL, Spark i big data — jeden przegląd całego wątku</h1>
+<p class="small">Zebrane 2026-11-05. Źródła: archiwum <code>data/archive/archive-2026-10-19/results/</code> (ścieżki względne wobec <code>idle-coordinator/data/</code>) i karty Notion; twierdzenia o wersjach/cenach sprawdzono na nowo 2026-11-05. Pełne dane: <a href="inventory.tsv">inventory.tsv</a>, <a href="digest.md">digest.md</a>, <a href="aged.tsv">aged.tsv</a>.</p>
+
+<h2>Streszczenie</h2>
+<p>Od 17 do 19 października 2026 wątek doradczy „SQL/Spark w banku” wykonał sześć zadań (190, 210, 220, 230, 260, 280; pierwotne plany 200–270 scalono parami). Powstał kompletny warsztat: katalog 44 antywzorców z pomiarami, 35 odtworzonych pułapek poprawności, benchmark 40 wadliwych programów z kluczami i scorerem, projekt AI-reviewera z czterema draft-skillami, prototyp kolektora dowodów (evidence collector) z modelu provenance oraz playbook pierwszych 30/90 dni z szablonami. Wszystkie artefakty fizycznie istnieją w archiwum (sprawdzone <code>ls</code>/<code>wc -l</code>), żadne nie trafiło do banku — wątek zakończył się naresearchu, bez ani jednego uruchomienia benchmarku na prawdziwym modelu.</p>
+
+<h2>Mapa zadań</h2>
+<table>
+<tr><th>ID</th><th>Co</th><th>Status</th><th>Co dostarczył</th><th>Gdzie</th></tr>
+<tr><td>190</td><td>Evidence collector</td><td>ukończone 2026-10-18</td><td>Survey 27 źródeł, model provenance, prototyp end-to-end (39 rekordów, 9 aplikacji/8 runów), porównanie OpenLineage</td><td><a href="../../../archive/archive-2026-10-19/results/190-sql-spark-evidence-collector/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f813aab32db60856d1f8e">Notion</a></td></tr>
+<tr><td>210</td><td>Wydajność i koszty</td><td>ukończone 2026-10-17</td><td>Katalog 44 antywzorców/dźwigni, 15 skryptów, 26 pomiarów z event logów</td><td><a href="../../../archive/archive-2026-10-19/results/210-sql-spark-performance-and-cost/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f815e8b91ed3461744eff">Notion</a></td></tr>
+<tr><td>220</td><td>AI reviewer</td><td>ukończone 2026-10-18</td><td>26 failure-modes LLM, eksperyment czytania (12 case'ów × 4 warunki), 4 draft-skille, compact_plan 13/13</td><td><a href="../../../archive/archive-2026-10-19/results/220-sql-spark-ai-reviewer-design/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f81f7ae35fed79915f730">Notion</a></td></tr>
+<tr><td>230</td><td>Narzędzia Windows+Docker</td><td>ukończone 2026-10-18</td><td>Preflight, 15 narzędzi w tools.tsv, venvy pyspark 3.5.9/4.2.0, 3 nietestowane Dockerfiles</td><td><a href="../../../archive/archive-2026-10-19/results/230-sql-spark-tools-on-windows-docker/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f81c48af0ef9114f13279">Notion</a></td></tr>
+<tr><td>260</td><td>Pułapki + benchmark</td><td>ukończone 2026-10-18..19 (2 próby + prereview)</td><td>35 pułapek odtworzonych lokalnie, 40 case'ów z kluczami i dekojami, score.py, TPC-H sf=0.1</td><td><a href="../../../archive/archive-2026-10-19/results/260-sql-spark-pitfalls-and-benchmark/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f812ba6cfe5b501b48703">Notion</a></td></tr>
+<tr><td>280</td><td>Playbook 30/90 dni</td><td>ukończone 2026-10-17</td><td>Playbook pomiaru, priorytetyzacji i regulacji (BCBS 239, SR 11-7, AI Act) + 5 szablonów</td><td><a href="../../../archive/archive-2026-10-19/results/280-sql-spark-consulting-playbook/report.md">report.md</a> · <a href="https://www.notion.so/40d2b2a5733f810985afc2ad27d6fd71">Notion</a></td></tr>
+<tr><td>200, 210-old, 220-old, 240, 250, 260-old, 270</td><td>Plany pierwotne</td><td>scalone przed wykonaniem</td><td>Preflight → 230; plany+antywzorce+koszty → 210; failure-modes+skille → 220; pułapki+benchmark → 260. Karty Notion istnieją</td><td><code>archive-2026-10-19/merged/</code></td></tr>
+<tr><td>1089, 1127</td><td>Frameless (Scala+Spark OSS)</td><td>ukończone 2026-11</td><td>Trzy PR-y tests-first (zwycięzca #452, aggMany/SPARK-20346, 19/20); 1127: zmiana c3 zielona na Spark 3.4.4 (415/415)</td><td><a href="../../1127-frameless-c3-spark34-verify/report.md">1127</a> · <a href="https://www.notion.so/40a2b2a5733f81f3a965c3c533cd9282">Notion</a></td></tr>
+<tr><td>100, 140, 185, 300, 330</td><td>Kontekst strategiczny</td><td>ukończone</td><td>Skills/praktyki, narzędzia AI-friendly, monetyzacja agentów, Metals MCP, rynek pracy</td><td><code>archive-2026-10-19/results/</code></td></tr>
+</table>
+
+<h2>Najważniejsze ustalenia (skrót)</h2>
+<details open><summary>210 — jak czytać plan i co naprawdę kosztuje</summary>
+<ul>
+<li>„<code>Exchange = shuffle boundary</code> — każde Exchange to sieć+sort+ryzyko skew; broadcast usuwa jedno” (<a href="../../../archive/archive-2026-10-19/results/210-sql-spark-performance-and-cost/report.md">report.md:40</a>).</li>
+<li>Pomiar: SortMergeJoin 1,64 s / 27,2 MB shuffle vs broadcast 0,67 s / 7,1 MB (report.md:43).</li>
+<li>AQE „flips at runtime”: 200-partycyjny reduce zbiegł do 1 zadania (0,99 s → 0,31 s); domyślne progi skew (64/256 MB) nic nie robią w małej skali (report.md:48-51).</li>
+<li>Skew nie widać w statycznym planie — dopiero max-vs-median czas zadań (18× straggler w e02, report.md:46).</li>
+</ul></details>
+<details><summary>260 — pułapki poprawności i benchmark</summary>
+<ul>
+<li>35 pułapek odtworzonych lokalnie (NULL, fan-out, WHERE vs ON, strefy czasowe, ANSI Spark 3 vs 4...), 40 case'ów z ukrytymi kluczami, dekojami i oracle z rzeczywistych runów (report.md:18-20).</li>
+<li>12 pułapek łapalnych linterem parsera, 23 wymagają danych/statystyk (report.md:37) — to reguła podziału pracy AI: deterministic-first.</li>
+<li>TPC-H sf=0.1 z oracle różnicowym DuckDB-vs-Spark: suma revenue zgadza się między silnikami (report.md:41).</li>
+</ul></details>
+<details><summary>220 — gdzie AI zawodzi jako reviewer</summary>
+<ul>
+<li>Sam tekst SQL: ~7/10 defektów; SQL+plan (i skondensowany plan): 9/10; skew i format danych niewidoczne w żadnej reprezentacji tekstowej — tylko w event logu (max/median 17,1) (report.md:26).</li>
+<li>26 failure-modes, 14 źródeł zweryfikowanych z cytami; folklore uczciwie oznaczony (report.md:14-16).</li>
+<li>Rekomendacja: pipeline lint → plan → skew → report; compact_plan.py przetestowany 13/13 (report.md:33-35,37).</li>
+</ul></details>
+<details><summary>190 — kolektor dowodów</summary>
+<ul>
+<li>Event logi Sparka niosą rdzeń dowodu (plan, pruned ReadSchema, metryki) — bez nowej instrumentacji (report.md:32).</li>
+<li>ReadSchema jest przycięty do kolumn, więc wersję schematu da się udowodnić tylko dla dotkniętych kolumn: werdykty NOT CURRENT / POSSIBLY OLDER / UNKNOWN (report.md:38).</li>
+<li>OpenLineage (wtedy 1.34.0) = komplement na przyszłość, nie substytut (report.md:45).</li>
+</ul></details>
+<details><summary>230 i 280 — narzędzia i playbook</summary>
+<ul>
+<li>Docker Desktop leżał (daemon down) — wszystkie Dockerfiles nietestowane; pydeequ 1.7.0 pada na Spark 3.5.9 i 4.2.0 (Py4JException) (230 report.md:60, handoff).</li>
+<li>Event log: 3.5.9 = jeden plik, 4.2.0 = katalog eventlog_v2 — ma znaczenie dla history servera w banku (230 report.md:33).</li>
+<li>Pierwsze pytanie pomiarowe w banku: „czy event logi są przechowywane, gdzie i jak długo?” (280 report.md:40); 5 szablonów w <code>templates/</code>.</li>
+</ul></details>
+
+<h2>Co się zestarzało (sprawdzone 2026-11-05)</h2>
+<table>
+<tr><th>Twierdzenie</th><th>Status</th><th>Stan dziś</th></tr>
+<tr><td>Spark 4.2.0 najnowszy (230/260)</td><td class="changed">zmienione</td><td>4.3.0 wydany 2026-10-30; patche 4.2.1/4.1.4/4.0.5 (2026-10-27) — <a href="https://spark.apache.org/downloads.html">spark.apache.org</a></td></tr>
+<tr><td>pyspark 3.5.x aktualny (210/230)</td><td class="still">nadal prawda (z zastrzeżeniem)</td><td>„Spark 3.5.9 released” — lipiec 2026, to wciąż najnowsze 3.5.x; brak komunikatu EOL, ale linia główna to 4.3.0 — <a href="https://spark.apache.org/news/">spark.apache.org/news</a></td></tr>
+<tr><td>OpenLineage 1.34.0 (190)</td><td class="changed">zmienione</td><td>najnowsze 1.55.0 (2026-10-30) — <a href="https://github.com/OpenLineage/OpenLineage/releases">releases</a></td></tr>
+<tr><td>sqlfluff 4.4.0 / sqlglot 30.23.0 (230)</td><td class="changed">zmienione (kosmetycznie)</td><td>4.5.0 (2026-10-30) / 30.29.0 — <a href="https://pypi.org/project/sqlfluff/">PyPI</a></td></tr>
+<tr><td>Amundsen martwy (190)</td><td class="still">nadal prawda</td><td>„archived by the owner on Sep 29, 2026 ... read-only” — <a href="https://github.com/amundsen-io/amundsen">GitHub</a></td></tr>
+<tr><td>Photon 2.9× DBU, 37% za pre-purchase (280)</td><td class="esc">ESCALATE</td><td>strony cenowe Azure/Databricks niedostępne dla fetchera (404 / &gt;10 MB); sprawdzić ręcznie przed użyciem w ofercie</td></tr>
+<tr><td>Unity Catalog „APIs currently evolving” (190)</td><td class="still">nadal prawda</td><td>README: „The APIs are currently evolving and should not be assumed to be stable.”; projekt aktywny — <a href="https://github.com/unitycatalog/unitycatalog">GitHub</a></td></tr>
+<tr><td>pydeequ 1.7.0 zepsuty na Spark 3.5/4.2 (230)</td><td class="still">nadal aktualny problem</td><td>najnowsza wersja to wciąż 1.7.0 (2026-09-14), fix nie wyszedł — <a href="https://pypi.org/pypi/pydeequ/">PyPI</a>; DuckDB 1.5.6 nie sprawdzone na nowo</td></tr>
+<tr><td>DuckDB 1.5.6 w benchmarku 260</td><td class="esc">ESCALATE</td><td>nie sprawdzono na nowo (pomiar lokalny, dotyczy reprodukowalności)</td></tr>
+</table>
+
+<h2>Luki — co wątek zaplanował, a nie zrobił</h2>
+<ul>
+<li><strong>Zero runów benchmarku na prawdziwych modelach</strong> — score.py z 260 nigdy nie przeliczył prawdziwej odpowiedzi reviewer-a; połączenie 260 (benchmark) z 220 (skille) nigdy nie nastąpiło (260 handoff: Not done).</li>
+<li>210: tylko 21/44 antywzorców ma lokalne pomiary; reszta cytowana ze źródeł (8 folklore) — brak wiernego repro dla dynamic allocation, spot, snapshot expiry.</li>
+<li>230: Docker nigdy nie wystartował (daemon down) — cały wątek „Windows bez WSL” jest nieudowodniony; pydeequ do naprawy lub wymiany.</li>
+<li>220: tylko 14/25+ źródeł fetch-verified; eksperyment czytania nie jest niezależny (te same osoby autorskie = ten sam model).</li>
+<li>260: TPC-DS tylko przepis; case 25 słaby oracle; mypy --strict nie przechodzi.</li>
+<li>280: terminy OpenAI, ankiety EBA/BoE, szczegóły billable-usage Databricks i dokładne stawki DBU — niezweryfikowane.</li>
+<li>190: historia gita prototypu (commity cdd939f/3c40d07) nie przetrwała archiwizacji — <code>git log</code> w archiwum zwraca „not a git repository”; pliki prototypu są.</li>
+</ul>
+
+<h2>Opcje — jak tego teraz użyć</h2>
+<ol>
+<li><strong>Skill „AI reviewer SQL/Spark” do własnych agentów</strong> (z 220). Wysiłek: M (kilka wieczorów). Potrzebuje: przeniesienia 4 draft-skillów do katalogu skilli, przetestowania na benchmarku 260 z 2-3 modelami (to zamyka też największą lukę wątku), decyzji o prywatności. Ryzyko małe, wszystko lokalne.</li>
+<li><strong>Publiczny open-source’owy benchmark wadliwych programów Spark</strong> (z 260). Wysiłek: L (1-2 tyg. z CI). Potrzebuje: licencji, porządku repo, CI na GitHub Actions, dopisania wyników 2-3 modeli jako baseline. Ryzyko: utrzymanie i świeżość wersji Spark (dziś 4.3.0).</li>
+<li><strong>Oferta konsultingowa dla banku</strong> (z 280 + 210 + 260). Wysiłek: M (tydzień). Potrzebuje: potwierdzenia ownera, dopasowania szablonów do konkretnego klienta, świeżych stawek DBU (ESCALATE powyżej) i odpowiedzi na pytania regulacyjne, których nie domknięto.</li>
+<li><strong>Prezentacja / artykuł „jak czytać plan Sparka i gdzie AI nie widzi”</strong> (z 210 + 220). Wysiłek: S-M. Potrzebuje: wyboru 10 wyników z pomiarami, slajdów; najtańsza opcja, test reakcji rynku.</li>
+<li><strong>Evidence-collector jako narzędzie/produkt</strong> (z 190). Wysiłek: XL. Potrzebuje: bump OpenLineage 1.34→1.55, decyzji o schedulerach (Airflow rows są tylko doc-based), pierwszego prawdziwego klienta. Rekomendowane dopiero po opcji 1 lub 3.</li>
+</ol>
+<p class="small">Rekomendacja (do decyzji ownera): opcja 1 jako następny krok — najmniejszy wysiłek, zamyka największą lukę (benchmark nigdy nie przebiegł na modelu) i daje materiał na opcje 2 i 4.</p>
+
+<footer>Zebral: glm-5.3 (ZCode idle subagent, zadanie 1668, 2026-11-05). Wszystkie twierdzenia łączą się ze źródłami powyżej; pełne cytaty z file:line w <a href="digest.md">digest.md</a>, stan wersji w <a href="aged.tsv">aged.tsv</a>.</footer>
+</main></body></html>

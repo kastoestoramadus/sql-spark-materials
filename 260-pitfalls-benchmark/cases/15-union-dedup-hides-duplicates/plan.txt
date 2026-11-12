@@ -1,0 +1,42 @@
+== Parsed Logical Plan ==
+'Project [unresolvedalias('COUNT(1))]
++- 'SubqueryAlias __auto_generated_subquery_name
+   +- 'Distinct
+      +- 'Union false, false
+         :- 'Project ['id]
+         :  +- 'UnresolvedRelation [q15a], [], false
+         +- 'Project ['id]
+            +- 'UnresolvedRelation [q15b], [], false
+== Analyzed Logical Plan ==
+count(1): bigint
+Aggregate [count(1) AS count(1)#567L]
++- SubqueryAlias __auto_generated_subquery_name
+   +- Distinct
+      +- Union false, false
+         :- Project [id#563]
+         :  +- SubqueryAlias q15a
+         :     +- View (`q15a`, [id#563])
+         :        +- Project [cast(id#562 as int) AS id#563]
+         :           +- Project [id#562]
+         :              +- SubqueryAlias t
+         :                 +- LocalRelation [id#562]
+         +- Project [id#565]
+            +- SubqueryAlias q15b
+               +- View (`q15b`, [id#565])
+                  +- Project [cast(id#564 as int) AS id#565]
+                     +- Project [id#564]
+                        +- SubqueryAlias t
+                           +- LocalRelation [id#564]
+== Optimized Logical Plan ==
+Aggregate [count(1) AS count(1)#567L]
++- Aggregate [id#563]
+   +- LocalRelation [id#563]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(1)], output=[count(1)#567L])
+   +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=2197]
+      +- HashAggregate(keys=[], functions=[partial_count(1)], output=[count#569L])
+         +- HashAggregate(keys=[id#563], functions=[], output=[])
+            +- Exchange hashpartitioning(id#563, 4), ENSURE_REQUIREMENTS, [plan_id=2193]
+               +- HashAggregate(keys=[id#563], functions=[], output=[id#563])
+                  +- LocalTableScan [id#563]

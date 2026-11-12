@@ -1,0 +1,22 @@
+{
+ "n": "10",
+ "name": "window-default-frame",
+ "difficulty": "hard",
+ "category": "correctness",
+ "pitfall": "010",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "RANGE frame",
+  "ties or peers",
+  "running total includes peers"
+ ],
+ "non_defects": [
+  "PARTITION BY acct is correct",
+  "final ORDER BY evt, amt in the outer query is fine"
+ ],
+ "df_variants": []
+}

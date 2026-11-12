@@ -1,0 +1,29 @@
+== Parsed Logical Plan ==
+'Sort ['k ASC NULLS FIRST], false
++- 'RepartitionByExpression ['bucket]
+   +- 'Project ['id, 'k]
+      +- 'UnresolvedRelation [q34], [], false
+== Analyzed Logical Plan ==
+id: bigint, k: bigint
+Sort [k#1137L ASC NULLS FIRST], false
++- Project [id#1136L, k#1137L]
+   +- RepartitionByExpression [bucket#1138L]
+      +- Project [id#1136L, k#1137L, bucket#1138L]
+         +- SubqueryAlias q34
+            +- View (`q34`, [id#1136L, k#1137L, bucket#1138L])
+               +- Project [cast(id#1139L as bigint) AS id#1136L, cast(k#1134L as bigint) AS k#1137L, cast(bucket#1135L as bigint) AS bucket#1138L]
+                  +- Project [id#1139L, (id#1139L % cast(4 as bigint)) AS k#1134L, (id#1139L % cast(3 as bigint)) AS bucket#1135L]
+                     +- Range (0, 24, step=1)
+== Optimized Logical Plan ==
+Sort [k#1137L ASC NULLS FIRST], false
++- Project [id#1139L, k#1137L]
+   +- RepartitionByExpression [bucket#1138L]
+      +- Project [id#1139L, (id#1139L % 4) AS k#1137L, (id#1139L % 3) AS bucket#1138L]
+         +- Range (0, 24, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [k#1137L ASC NULLS FIRST], false, 0
+   +- Project [id#1139L, k#1137L]
+      +- Exchange hashpartitioning(bucket#1138L, 4), REPARTITION_BY_COL, [plan_id=4245]
+         +- Project [id#1139L, (id#1139L % 4) AS k#1137L, (id#1139L % 3) AS bucket#1138L]
+            +- Range (0, 24, step=1, splits=1)

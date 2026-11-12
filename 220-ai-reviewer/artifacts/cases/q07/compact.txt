@@ -1,0 +1,25 @@
+== Parsed Logical Plan ==
+'Project ['o_id, 'amount, 'row_number() windowspecdefinition('amount DESC NULLS LAST, ...(1 more cols elided)]
+'UnresolvedRelation [orders], [], false
+== Analyzed Logical Plan ==
+Project [o_id, amount, rn]
+Project [o_id, amount, rn, rn]
+Window [row_number() windowspecdefinition(amount DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), ...(1 more cols elided)], [amount DESC NULLS LAST]
+  +- Project [o_id, amount]
+    +- SubqueryAlias orders
+      +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Optimized Logical Plan ==
+Window [row_number() windowspecdefinition(amount DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), ...(1 more cols elided)], [amount DESC NULLS LAST]
+Project [o_id, amount]
+Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Physical Plan ==
+Window [row_number() windowspecdefinition(amount DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), ...(1 more cols elided)], [amount DESC NULLS LAST]
+[wcg]Sort [amount DESC NULLS LAST], false, 0
+Exchange SinglePartition, ENSURE_REQUIREMENTS
+  +- [wcg]ColumnarToRow
+    +- FileScan parquet orders[o_id,amount] Batched: true, DataFilters: [], Format: Parquet, Location: <paths elided>, PushedFilters: [], ReadSchema: <elided>
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Analyzed Logical Plan: unpartitioned window - every row in one partition/task -> Window [row_number() windowspecdefinition(amount#145 DESC NULLS LAST, specifiedwindowframe
+  WARN: Optimized Logical Plan: unpartitioned window - every row in one partition/task -> Window [row_number() windowspecdefinition(amount#145 DESC NULLS LAST, specifiedwindowframe
+  WARN: Physical Plan: unpartitioned window - every row in one partition/task -> Window [row_number() windowspecdefinition(amount#145 DESC NULLS LAST, specifiedwindowframe
+  WARN: Physical Plan: single-partition exchange - all rows to one task -> Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=672]

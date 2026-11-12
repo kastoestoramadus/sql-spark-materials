@@ -1,0 +1,25 @@
+# UNTESTED (2026-10-18, Docker daemon down in preflight).
+# Windows + Docker Desktop without WSL: both services are Linux containers driven
+# from PowerShell; the only host dependency is the ./spark-events bind mount.
+services:
+  history:
+    build:
+      context: .
+      dockerfile: Dockerfile.history-dataflint
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./spark-events:/mnt/spark-events
+      - ./spark-history.properties:/opt/spark/conf/spark-history.properties:ro
+  analysers:
+    build:
+      context: ..
+      dockerfile: dockerfiles/Dockerfile.analysers
+    volumes:
+      - ./spark-events:/work/logs/spark-events35
+    depends_on:
+      - history
+# usage:
+#   docker compose up --build -d history
+#   docker compose run --rm analysers            # writes event logs into ./spark-events
+#   open http://localhost:18080 (Spark UI + DataFlint tab)

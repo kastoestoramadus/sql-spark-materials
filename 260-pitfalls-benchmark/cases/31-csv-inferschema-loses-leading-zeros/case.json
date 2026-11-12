@@ -1,0 +1,26 @@
+{
+ "n": "31",
+ "name": "csv-inferschema-loses-leading-zeros",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "031",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "inferSchema turns leading-zero codes into INT",
+  "codes corrupted before the join",
+  "schema must be explicit"
+ ],
+ "non_defects": [
+  "CSV with header=True is fine",
+  "the dimension table itself is correct"
+ ],
+ "df_variants": [
+  "spark.read.option('header','true').option('inferSchema','true').csv('31-csv-inferschema-loses-leading-zeros/data.csv').schema.simpleString()",
+  "spark.read.option('header','true').option('inferSchema','true').csv('31-csv-inferschema-loses-leading-zeros/data.csv').collect()",
+  "spark.read.option('header','true').schema('code STRING, name STRING').csv('31-csv-inferschema-loses-leading-zeros/data.csv').collect()"
+ ]
+}

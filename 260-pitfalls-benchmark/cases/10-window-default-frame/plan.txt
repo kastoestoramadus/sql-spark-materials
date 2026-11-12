@@ -1,0 +1,31 @@
+== Parsed Logical Plan ==
+'Sort ['evt ASC NULLS FIRST, 'amt ASC NULLS FIRST], true
++- 'Project ['evt, 'amt, 'SUM('amt) windowspecdefinition('acct, 'evt ASC NULLS FIRST, unspecifiedframe$()) AS running#347]
+   +- 'UnresolvedRelation [q10], [], false
+== Analyzed Logical Plan ==
+evt: int, amt: int, running: bigint
+Sort [evt#356 ASC NULLS FIRST, amt#357 ASC NULLS FIRST], true
++- Project [evt#356, amt#357, running#347L]
+   +- Project [evt#356, amt#357, acct#355, running#347L, running#347L]
+      +- Window [sum(amt#357) windowspecdefinition(acct#355, evt#356 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS running#347L], [acct#355], [evt#356 ASC NULLS FIRST]
+         +- Project [evt#356, amt#357, acct#355]
+            +- SubqueryAlias q10
+               +- View (`q10`, [acct#355, evt#356, amt#357])
+                  +- Project [cast(acct#352 as int) AS acct#355, cast(evt#353 as int) AS evt#356, cast(amt#354 as int) AS amt#357]
+                     +- Project [acct#352, evt#353, amt#354]
+                        +- SubqueryAlias t
+                           +- LocalRelation [acct#352, evt#353, amt#354]
+== Optimized Logical Plan ==
+Sort [evt#356 ASC NULLS FIRST, amt#357 ASC NULLS FIRST], true
++- Project [evt#356, amt#357, running#347L]
+   +- Window [sum(amt#357) windowspecdefinition(acct#355, evt#356 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS running#347L], [acct#355], [evt#356 ASC NULLS FIRST]
+      +- LocalRelation [evt#356, amt#357, acct#355]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [evt#356 ASC NULLS FIRST, amt#357 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(evt#356 ASC NULLS FIRST, amt#357 ASC NULLS FIRST, 4), ENSURE_REQUIREMENTS, [plan_id=1320]
+      +- Project [evt#356, amt#357, running#347L]
+         +- Window [sum(amt#357) windowspecdefinition(acct#355, evt#356 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS running#347L], [acct#355], [evt#356 ASC NULLS FIRST]
+            +- Sort [acct#355 ASC NULLS FIRST, evt#356 ASC NULLS FIRST], false, 0
+               +- Exchange hashpartitioning(acct#355, 4), ENSURE_REQUIREMENTS, [plan_id=1315]
+                  +- LocalTableScan [evt#356, amt#357, acct#355]

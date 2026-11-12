@@ -1,0 +1,36 @@
+== Optimized Logical Plan ==
+Aggregate [o_id#140L], [o_id#140L, sum(amount#145) AS total#221], Statistics(sizeInBytes=80.8 PiB)
++- Project [o_id#140L, amount#145], Statistics(sizeInBytes=60.6 PiB)
+   +- Join Inner, (o_id#140L = o_id#223L), Statistics(sizeInBytes=80.8 PiB)
+      :- Project [o_id#140L, amount#145], Statistics(sizeInBytes=78.4 GiB)
+      :  +- Join Inner, (o_id#140L = o_id#195L), Statistics(sizeInBytes=104.5 GiB)
+      :     :- Project [o_id#140L, amount#145], Statistics(sizeInBytes=101.3 KiB)
+      :     :  +- Filter isnotnull(o_id#140L), Statistics(sizeInBytes=405.2 KiB)
+      :     :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+      :     +- Project [o_id#195L], Statistics(sizeInBytes=1056.2 KiB)
+      :        +- Filter isnotnull(o_id#195L), Statistics(sizeInBytes=2.3 MiB)
+      :           +- Relation spark_catalog.default.order_items[oi_id#194L,o_id#195L,qty#196,price#197] parquet, Statistics(sizeInBytes=2.3 MiB)
+      +- Project [o_id#223L], Statistics(sizeInBytes=1056.2 KiB)
+         +- Filter isnotnull(o_id#223L), Statistics(sizeInBytes=2.3 MiB)
+            +- Relation spark_catalog.default.order_items[oi_id#222L,o_id#223L,qty#224,price#225] parquet, Statistics(sizeInBytes=2.3 MiB)
+
+== Physical Plan ==
+*(8) HashAggregate(keys=[o_id#140L], functions=[sum(amount#145)], output=[o_id#140L, total#221])
++- *(8) HashAggregate(keys=[o_id#140L], functions=[partial_sum(amount#145)], output=[o_id#140L, sum#232, isEmpty#233])
+   +- *(8) Project [o_id#140L, amount#145]
+      +- *(8) SortMergeJoin [o_id#140L], [o_id#223L], Inner
+         :- *(5) Project [o_id#140L, amount#145]
+         :  +- *(5) SortMergeJoin [o_id#140L], [o_id#195L], Inner
+         :     :- *(2) Sort [o_id#140L ASC NULLS FIRST], false, 0
+         :     :  +- Exchange hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=844]
+         :     :     +- *(1) Filter isnotnull(o_id#140L)
+         :     :        +- *(1) ColumnarToRow
+         :     :           +- FileScan parquet spark_catalog.default.orders[o_id#140L,amount#145] Batched: true, DataFilters: [isnotnull(o_id#140L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+         :     +- *(4) Sort [o_id#195L ASC NULLS FIRST], false, 0
+         :        +- Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=853]
+         :           +- *(3) Filter isnotnull(o_id#195L)
+         :              +- *(3) ColumnarToRow
+         :                 +- FileScan parquet spark_catalog.default.order_items[o_id#195L] Batched: true, DataFilters: [isnotnull(o_id#195L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint>
+         +- *(7) Sort [o_id#223L ASC NULLS FIRST], false, 0
+            +- ReusedExchange [o_id#223L], Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=853]
+

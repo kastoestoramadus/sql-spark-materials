@@ -1,0 +1,25 @@
+== Parsed Logical Plan ==
+'Project [unresolvedalias('count(1))]
++- 'Filter ('rand() < 0.5)
+   +- 'UnresolvedRelation [q13], [], false
+== Analyzed Logical Plan ==
+count(1): bigint
+Aggregate [count(1) AS count(1)#487L]
++- Filter (rand(7767399416881038952) < cast(0.5 as double))
+   +- SubqueryAlias q13
+      +- View (`q13`, [id#483L, grp#484L])
+         +- Project [cast(id#485L as bigint) AS id#483L, cast(grp#482L as bigint) AS grp#484L]
+            +- Project [id#485L, (id#485L % cast(10 as bigint)) AS grp#482L]
+               +- Range (0, 2000, step=1)
+== Optimized Logical Plan ==
+Aggregate [count(1) AS count(1)#487L]
++- Project
+   +- Filter (rand(7767399416881038952) < 0.5)
+      +- Range (0, 2000, step=1)
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(1)], output=[count(1)#487L])
+   +- HashAggregate(keys=[], functions=[partial_count(1)], output=[count#489L])
+      +- Project
+         +- Filter (rand(7767399416881038952) < 0.5)
+            +- Range (0, 2000, step=1, splits=1)

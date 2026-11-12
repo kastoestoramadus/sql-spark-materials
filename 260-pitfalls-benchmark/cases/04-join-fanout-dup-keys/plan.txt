@@ -1,0 +1,41 @@
+== Parsed Logical Plan ==
+'Project ['SUM('f.amt) AS total#74]
++- 'Join Inner, ('f.acct = 'd.acct)
+   :- 'SubqueryAlias f
+   :  +- 'UnresolvedRelation [q04f], [], false
+   +- 'SubqueryAlias d
+      +- 'UnresolvedRelation [q04d], [], false
+== Analyzed Logical Plan ==
+total: bigint
+Aggregate [sum(amt#82) AS total#74L]
++- Join Inner, (acct#81 = acct#84)
+   :- SubqueryAlias f
+   :  +- SubqueryAlias q04f
+   :     +- View (`q04f`, [acct#81, amt#82])
+   :        +- Project [cast(acct#79 as int) AS acct#81, cast(amt#80 as int) AS amt#82]
+   :           +- Project [acct#79, amt#80]
+   :              +- SubqueryAlias t
+   :                 +- LocalRelation [acct#79, amt#80]
+   +- SubqueryAlias d
+      +- SubqueryAlias q04d
+         +- View (`q04d`, [acct#84])
+            +- Project [cast(acct#83 as int) AS acct#84]
+               +- Project [acct#83]
+                  +- SubqueryAlias t
+                     +- LocalRelation [acct#83]
+== Optimized Logical Plan ==
+Aggregate [sum(amt#82) AS total#74L]
++- Project [amt#82]
+   +- Join Inner, (acct#81 = acct#84)
+      :- LocalRelation [acct#81, amt#82]
+      +- LocalRelation [acct#84]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[sum(amt#82)], output=[total#74L])
+   +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=265]
+      +- HashAggregate(keys=[], functions=[partial_sum(amt#82)], output=[sum#87L])
+         +- Project [amt#82]
+            +- BroadcastHashJoin [acct#81], [acct#84], Inner, BuildRight, false, false
+               :- LocalTableScan [acct#81, amt#82]
+               +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, false] as bigint)),false), [plan_id=260]
+                  +- LocalTableScan [acct#84]

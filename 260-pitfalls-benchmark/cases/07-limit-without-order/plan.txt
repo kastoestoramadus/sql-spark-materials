@@ -1,0 +1,22 @@
+== Parsed Logical Plan ==
+'GlobalLimit 5
++- 'LocalLimit 5
+   +- 'Project ['id]
+      +- 'UnresolvedRelation [q07], [], false
+== Analyzed Logical Plan ==
+id: bigint
+GlobalLimit 5
++- LocalLimit 5
+   +- Project [id#206L]
+      +- SubqueryAlias q07
+         +- View (`q07`, [id#206L, k#207L])
+            +- Project [cast(id#208L as bigint) AS id#206L, cast(k#205L as bigint) AS k#207L]
+               +- Project [id#208L, (id#208L % cast(7 as bigint)) AS k#205L]
+                  +- Range (0, 200, step=1)
+== Optimized Logical Plan ==
+GlobalLimit 5
++- LocalLimit 5
+   +- Range (0, 200, step=1)
+== Physical Plan ==
+CollectLimit 5
++- *(1) Range (0, 200, step=1, splits=1)

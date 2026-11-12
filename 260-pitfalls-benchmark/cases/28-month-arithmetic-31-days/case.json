@@ -1,0 +1,22 @@
+{
+ "n": "28",
+ "name": "month-arithmetic-31-days",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "028",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "fixed 31-day month assumption",
+  "skips February",
+  "INTERVAL 1 MONTH clamps"
+ ],
+ "non_defects": [
+  "the date literal being end-of-month is not itself a defect",
+  "datediff is not used here"
+ ],
+ "df_variants": []
+}

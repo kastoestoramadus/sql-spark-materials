@@ -1,0 +1,1 @@
+SELECT id FROM q01 WHERE note = NULL;

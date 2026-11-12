@@ -1,0 +1,1 @@
+SELECT s FROM q23 WHERE s = 10 ORDER BY s;

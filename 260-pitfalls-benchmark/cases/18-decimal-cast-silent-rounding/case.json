@@ -1,0 +1,22 @@
+{
+ "n": "18",
+ "name": "decimal-cast-silent-rounding",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "018",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "narrowing DECIMAL cast rounds silently",
+  "precision loss on money",
+  "HALF_UP applied without a policy"
+ ],
+ "non_defects": [
+  "DECIMAL(5,2) is a valid type for presentation when agreed",
+  "the values themselves are clean"
+ ],
+ "df_variants": []
+}

@@ -1,0 +1,33 @@
+== Parsed Logical Plan ==
+'Project ['c.customer_id, 'c.name]
++- 'Filter NOT 'c.customer_id IN (list#162 [])
+   :  +- 'Project ['customer_id]
+   :     +- 'UnresolvedRelation [support_tickets], [], false
+   +- 'SubqueryAlias c
+      +- 'UnresolvedRelation [customers], [], false
+
+== Analyzed Logical Plan ==
+customer_id: bigint, name: string
+Project [customer_id#147L, name#148]
++- Filter NOT customer_id#147L IN (list#162 [])
+   :  +- Project [customer_id#152L]
+   :     +- SubqueryAlias spark_catalog.default.support_tickets
+   :        +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+   +- SubqueryAlias c
+      +- SubqueryAlias spark_catalog.default.customers
+         +- Relation spark_catalog.default.customers[customer_id#147L,name#148,country#149,segment#150] parquet
+
+== Optimized Logical Plan ==
+Join LeftAnti, ((customer_id#147L = customer_id#152L) OR isnull((customer_id#147L = customer_id#152L)))
+:- Project [customer_id#147L, name#148]
+:  +- Relation spark_catalog.default.customers[customer_id#147L,name#148,country#149,segment#150] parquet
++- Project [customer_id#152L]
+   +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+
+== Physical Plan ==
+*(2) BroadcastHashJoin [customer_id#147L], [customer_id#152L], LeftAnti, BuildRight, true
+:- *(2) ColumnarToRow
+:  +- FileScan parquet spark_catalog.default.customers[customer_id#147L,name#148] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint,name:string>
++- BroadcastExchange HashedRelationBroadcastMode(List(input[0, bigint, true]),true), [plan_id=386]
+   +- *(1) ColumnarToRow
+      +- FileScan parquet spark_catalog.default.support_tickets[customer_id#152L] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [], ReadSchema: struct<customer_id:bigint>

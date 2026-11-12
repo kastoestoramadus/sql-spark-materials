@@ -1,0 +1,22 @@
+{
+ "n": "30",
+ "name": "case-sensitive-join",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "030",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "case-sensitive",
+  "join drops matches",
+  "lower()"
+ ],
+ "non_defects": [
+  "the amounts and groups are irrelevant",
+  "NULL names are not involved here"
+ ],
+ "df_variants": []
+}

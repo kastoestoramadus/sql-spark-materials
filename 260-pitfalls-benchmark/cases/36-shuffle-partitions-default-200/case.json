@@ -1,0 +1,31 @@
+{
+ "n": "36",
+ "name": "shuffle-partitions-default-200",
+ "difficulty": "hard",
+ "category": "performance",
+ "pitfall": "-",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "default 200 shuffle partitions for 10k rows",
+  "199 nearly-empty tasks per stage",
+  "spark.sql.shuffle.partitions not sized",
+  "AQE coalescing not verified"
+ ],
+ "non_defects": [
+  "GROUP BY k is the right shape",
+  "50 groups is not the problem"
+ ],
+ "df_variants": [
+  "spark.conf.set('spark.sql.adaptive.enabled','false')",
+  "spark.conf.set('spark.sql.shuffle.partitions','200')",
+  "spark.table('q36').repartition('k').rdd.getNumPartitions()",
+  "spark.conf.set('spark.sql.shuffle.partitions','8')",
+  "spark.table('q36').repartition('k').rdd.getNumPartitions()",
+  "spark.conf.set('spark.sql.shuffle.partitions','4')",
+  "spark.conf.set('spark.sql.adaptive.enabled','true')"
+ ]
+}

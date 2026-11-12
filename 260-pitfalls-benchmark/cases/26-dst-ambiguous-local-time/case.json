@@ -1,0 +1,25 @@
+{
+ "n": "26",
+ "name": "dst-ambiguous-local-time",
+ "difficulty": "hard",
+ "category": "correctness",
+ "pitfall": "026",
+ "variants": [
+  {
+   "tz": "UTC"
+  },
+  {
+   "tz": "Europe/Warsaw"
+  }
+ ],
+ "required_findings": [
+  "DST overlap or fall-back",
+  "local time ambiguous",
+  "offset required"
+ ],
+ "non_defects": [
+  "the two rows having the same wall-clock string is legitimate data",
+  "session timezone UTC is not the defect"
+ ],
+ "df_variants": []
+}

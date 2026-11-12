@@ -1,0 +1,37 @@
+== Parsed Logical Plan ==
+'Except false
+:- 'Project ['v]
+:  +- 'UnresolvedRelation [q16l], [], false
++- 'Project ['v]
+   +- 'UnresolvedRelation [q16r], [], false
+== Analyzed Logical Plan ==
+v: int
+Except false
+:- Project [v#593]
+:  +- SubqueryAlias q16l
+:     +- View (`q16l`, [v#593])
+:        +- Project [cast(v#592 as int) AS v#593]
+:           +- Project [v#592]
+:              +- SubqueryAlias t
+:                 +- LocalRelation [v#592]
++- Project [v#595]
+   +- SubqueryAlias q16r
+      +- View (`q16r`, [v#595])
+         +- Project [cast(v#594 as int) AS v#595]
+            +- Project [v#594]
+               +- SubqueryAlias t
+                  +- LocalRelation [v#594]
+== Optimized Logical Plan ==
+Aggregate [v#593], [v#593]
++- Join LeftAnti, (v#593 <=> v#595)
+   :- LocalRelation [v#593]
+   +- LocalRelation [v#595]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[v#593], functions=[], output=[v#593])
+   +- Exchange hashpartitioning(v#593, 4), ENSURE_REQUIREMENTS, [plan_id=2363]
+      +- HashAggregate(keys=[v#593], functions=[], output=[v#593])
+         +- BroadcastHashJoin [coalesce(v#593, 0), isnull(v#593)], [coalesce(v#595, 0), isnull(v#595)], LeftAnti, BuildRight, false, false
+            :- LocalTableScan [v#593]
+            +- BroadcastExchange HashedRelationBroadcastMode(List(coalesce(input[0, int, false], 0), isnull(input[0, int, false])),false), [plan_id=2359]
+               +- LocalTableScan [v#595]

@@ -1,0 +1,65 @@
+== Parsed Logical Plan ==
+'Sort ['o.amount DESC NULLS LAST], true
+'Project ['c.name, 'o.amount]
+'Join Inner, ('t.priority = HIGH)
+  +- 'Join Inner, ('o.region = 'c.country)
+    +- 'SubqueryAlias o
+      +- 'UnresolvedRelation [orders], [], false
+    +- 'SubqueryAlias c
+      +- 'UnresolvedRelation [customers], [], false
+  +- 'SubqueryAlias t
+    +- 'UnresolvedRelation [support_tickets], [], false
+== Analyzed Logical Plan ==
+Sort [amount DESC NULLS LAST], true
+Project [name, amount]
+Join Inner, (priority = HIGH)
+  +- Join Inner, (region = country)
+    +- SubqueryAlias o
+      +- SubqueryAlias orders
+        +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+    +- SubqueryAlias c
+      +- SubqueryAlias customers
+        +- Relation customers[customer_id,name,country,segment] parquet
+  +- SubqueryAlias t
+    +- SubqueryAlias support_tickets
+      +- Relation support_tickets[t_id,customer_id,priority] parquet
+== Optimized Logical Plan ==
+Sort [amount DESC NULLS LAST], true
+Project [name, amount]
+Join Inner
+  +- Project [amount, name]
+    +- Join Inner, (region = country)
+      +- Project [amount, region]
+        +- Filter isnotnull(region)
+          +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+      +- Project [name, country]
+        +- Filter isnotnull(country)
+          +- Relation customers[customer_id,name,country,segment] parquet
+  +- Project
+    +- Filter (isnotnull(priority) AND (priority = HIGH))
+      +- Relation support_tickets[t_id,customer_id,priority] parquet
+== Physical Plan ==
+[wcg]Sort [amount DESC NULLS LAST], true, 0
+Exchange rangepartitioning(amount DESC NULLS LAST, 200), ENSURE_REQUIREMENTS
+[wcg]Project [name, amount]
+  +- CartesianProduct
+    +- [wcg]Project [amount, name]
+      +- [wcg]SortMergeJoin [region], [country], Inner
+        +- [wcg]Sort [region ASC NULLS FIRST], false, 0
+          +- Exchange hashpartitioning(region, 200), ENSURE_REQUIREMENTS
+            +- [wcg]Filter isnotnull(region)
+              +- [wcg]ColumnarToRow
+                +- FileScan parquet orders[amount,region] Batched: true, DataFilters: [isnotnull(region)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(region)], ReadSchema: <elided>
+        +- [wcg]Sort [country ASC NULLS FIRST], false, 0
+          +- Exchange hashpartitioning(country, 200), ENSURE_REQUIREMENTS
+            +- [wcg]Filter isnotnull(country)
+              +- [wcg]ColumnarToRow
+                +- FileScan parquet customers[name,country] Batched: true, DataFilters: [isnotnull(country)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(country)], ReadSchema: <elided
+    +- [wcg]Project
+      +- [wcg]Filter (isnotnull(priority) AND (priority = HIGH))
+        +- [wcg]ColumnarToRow
+          +- FileScan parquet support_tickets[priority] Batched: true, DataFilters: [isnotnull(priority), (priority = HIGH)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(priority
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: cartesian product (no equi-join condition) -> CartesianProduct
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=203]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(country#149, 200), ENSURE_REQUIREMENTS, [plan_id=212]

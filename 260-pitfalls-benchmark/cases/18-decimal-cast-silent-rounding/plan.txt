@@ -1,0 +1,16 @@
+== Parsed Logical Plan ==
+'Project ['id, cast('amount as decimal(5,2)) AS amount_2dp#659]
++- 'UnresolvedRelation [q18], [], false
+== Analyzed Logical Plan ==
+id: int, amount_2dp: decimal(5,2)
+Project [id#666, cast(amount#667 as decimal(5,2)) AS amount_2dp#659]
++- SubqueryAlias q18
+   +- View (`q18`, [id#666, amount#667])
+      +- Project [cast(id#664 as int) AS id#666, cast(amount#665 as decimal(10,3)) AS amount#667]
+         +- Project [id#664, amount#665]
+            +- SubqueryAlias t
+               +- LocalRelation [id#664, amount#665]
+== Optimized Logical Plan ==
+LocalRelation [id#666, amount_2dp#659]
+== Physical Plan ==
+LocalTableScan [id#666, amount_2dp#659]

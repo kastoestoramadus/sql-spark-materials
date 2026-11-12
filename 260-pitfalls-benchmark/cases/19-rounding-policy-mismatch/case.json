@@ -1,0 +1,21 @@
+{
+ "n": "19",
+ "name": "rounding-policy-mismatch",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "019",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "HALF_UP",
+  "HALF_EVEN or banker",
+  "bround"
+ ],
+ "non_defects": [
+  "round(2.5)=3 alone is not a bug \u2014 the mismatch of policies is"
+ ],
+ "df_variants": []
+}

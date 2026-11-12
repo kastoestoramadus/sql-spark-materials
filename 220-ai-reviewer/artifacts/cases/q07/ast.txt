@@ -1,0 +1,21 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=o_id, quoted=False)),
+    Column(
+      this=Identifier(this=amount, quoted=False)),
+    Alias(
+      this=Window(
+        this=RowNumber(),
+        order=Order(
+          expressions=[
+            Ordered(
+              this=Column(
+                this=Identifier(this=amount, quoted=False)),
+              desc=True,
+              nulls_first=False)]),
+        over=OVER),
+      alias=Identifier(this=rn, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False))))

@@ -1,0 +1,20 @@
+== Parsed Logical Plan ==
+'Project ['o.o_id, 'o.amount]
+'Filter ('to_date('o.order_ts, MM/dd/yyyy) >= 2024-01-01)
+'SubqueryAlias o
+  +- 'UnresolvedRelation [orders], [], false
+== Analyzed Logical Plan ==
+Project [o_id, amount]
+Filter (to_date(order_ts, Some(MM/dd/yyyy), Some(Europe/Warsaw), false) >= 2024-01-01)
+SubqueryAlias o
+  +- SubqueryAlias orders
+    +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Optimized Logical Plan ==
+Project [o_id, amount]
+Filter (gettimestamp(order_ts, MM/dd/yyyy, TimestampType, Some(Europe/Warsaw), false) >= 2024-01-01 00:00:00)
+Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+== Physical Plan ==
+[wcg]Project [o_id, amount]
+[wcg]Filter (gettimestamp(order_ts, MM/dd/yyyy, TimestampType, Some(Europe/Warsaw), false) >= 2024-01-01 00:00:00)
+[wcg]ColumnarToRow
+  +- FileScan parquet orders[o_id,order_ts,amount] Batched: true, DataFilters: [(gettimestamp(order_ts, MM/dd/yyyy, TimestampType, ...(5 more cols elided)], ReadSchema: <elided>

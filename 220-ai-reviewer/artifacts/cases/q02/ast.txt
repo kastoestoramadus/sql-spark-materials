@@ -1,0 +1,36 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=o_id, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Column(
+      this=Identifier(this=t_id, quoted=False),
+      table=Identifier(this=t, quoted=False)),
+    Column(
+      this=Identifier(this=amount, quoted=False),
+      table=Identifier(this=o, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  joins=[
+    Join(
+      this=Table(
+        this=Identifier(this=support_tickets, quoted=False),
+        alias=TableAlias(
+          this=Identifier(this=t, quoted=False))),
+      side=LEFT,
+      on=EQ(
+        this=Column(
+          this=Identifier(this=customer_id, quoted=False),
+          table=Identifier(this=o, quoted=False)),
+        expression=Column(
+          this=Identifier(this=customer_id, quoted=False),
+          table=Identifier(this=t, quoted=False))))],
+  where=Where(
+    this=EQ(
+      this=Column(
+        this=Identifier(this=priority, quoted=False),
+        table=Identifier(this=t, quoted=False)),
+      expression=Literal(this='HIGH', is_string=True))))

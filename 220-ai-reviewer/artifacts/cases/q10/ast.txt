@@ -1,0 +1,46 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=o_id, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Alias(
+      this=Sum(
+        this=Column(
+          this=Identifier(this=amount, quoted=False),
+          table=Identifier(this=o, quoted=False))),
+      alias=Identifier(this=total, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  joins=[
+    Join(
+      this=Table(
+        this=Identifier(this=order_items, quoted=False),
+        alias=TableAlias(
+          this=Identifier(this=i1, quoted=False))),
+      on=EQ(
+        this=Column(
+          this=Identifier(this=o_id, quoted=False),
+          table=Identifier(this=o, quoted=False)),
+        expression=Column(
+          this=Identifier(this=o_id, quoted=False),
+          table=Identifier(this=i1, quoted=False)))),
+    Join(
+      this=Table(
+        this=Identifier(this=order_items, quoted=False),
+        alias=TableAlias(
+          this=Identifier(this=i2, quoted=False))),
+      on=EQ(
+        this=Column(
+          this=Identifier(this=o_id, quoted=False),
+          table=Identifier(this=o, quoted=False)),
+        expression=Column(
+          this=Identifier(this=o_id, quoted=False),
+          table=Identifier(this=i2, quoted=False))))],
+  group=Group(
+    expressions=[
+      Column(
+        this=Identifier(this=o_id, quoted=False),
+        table=Identifier(this=o, quoted=False))]))

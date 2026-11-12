@@ -1,0 +1,65 @@
+== Parsed Logical Plan ==
+'Sort ['o.amount DESC NULLS LAST], true
++- 'Project ['c.name, 'o.amount]
+   +- 'Join Inner, ('t.priority = HIGH)
+      :- 'Join Inner, ('o.region = 'c.country)
+      :  :- 'SubqueryAlias o
+      :  :  +- 'UnresolvedRelation [orders], [], false
+      :  +- 'SubqueryAlias c
+      :     +- 'UnresolvedRelation [customers], [], false
+      +- 'SubqueryAlias t
+         +- 'UnresolvedRelation [support_tickets], [], false
+
+== Analyzed Logical Plan ==
+name: string, amount: decimal(10,2)
+Sort [amount#145 DESC NULLS LAST], true
++- Project [name#148, amount#145]
+   +- Join Inner, (priority#153 = HIGH)
+      :- Join Inner, (region#146 = country#149)
+      :  :- SubqueryAlias o
+      :  :  +- SubqueryAlias spark_catalog.default.orders
+      :  :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+      :  +- SubqueryAlias c
+      :     +- SubqueryAlias spark_catalog.default.customers
+      :        +- Relation spark_catalog.default.customers[customer_id#147L,name#148,country#149,segment#150] parquet
+      +- SubqueryAlias t
+         +- SubqueryAlias spark_catalog.default.support_tickets
+            +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+
+== Optimized Logical Plan ==
+Sort [amount#145 DESC NULLS LAST], true
++- Project [name#148, amount#145]
+   +- Join Inner
+      :- Project [amount#145, name#148]
+      :  +- Join Inner, (region#146 = country#149)
+      :     :- Project [amount#145, region#146]
+      :     :  +- Filter isnotnull(region#146)
+      :     :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+      :     +- Project [name#148, country#149]
+      :        +- Filter isnotnull(country#149)
+      :           +- Relation spark_catalog.default.customers[customer_id#147L,name#148,country#149,segment#150] parquet
+      +- Project
+         +- Filter (isnotnull(priority#153) AND (priority#153 = HIGH))
+            +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+
+== Physical Plan ==
+*(8) Sort [amount#145 DESC NULLS LAST], true, 0
++- Exchange rangepartitioning(amount#145 DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=229]
+   +- *(7) Project [name#148, amount#145]
+      +- CartesianProduct
+         :- *(5) Project [amount#145, name#148]
+         :  +- *(5) SortMergeJoin [region#146], [country#149], Inner
+         :     :- *(2) Sort [region#146 ASC NULLS FIRST], false, 0
+         :     :  +- Exchange hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=203]
+         :     :     +- *(1) Filter isnotnull(region#146)
+         :     :        +- *(1) ColumnarToRow
+         :     :           +- FileScan parquet spark_catalog.default.orders[amount#145,region#146] Batched: true, DataFilters: [isnotnull(region#146)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(region)], ReadSchema: struct<amount:decimal(10,2),region:string>
+         :     +- *(4) Sort [country#149 ASC NULLS FIRST], false, 0
+         :        +- Exchange hashpartitioning(country#149, 200), ENSURE_REQUIREMENTS, [plan_id=212]
+         :           +- *(3) Filter isnotnull(country#149)
+         :              +- *(3) ColumnarToRow
+         :                 +- FileScan parquet spark_catalog.default.customers[name#148,country#149] Batched: true, DataFilters: [isnotnull(country#149)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(country)], ReadSchema: struct<name:string,country:string>
+         +- *(6) Project
+            +- *(6) Filter (isnotnull(priority#153) AND (priority#153 = HIGH))
+               +- *(6) ColumnarToRow
+                  +- FileScan parquet spark_catalog.default.support_tickets[priority#153] Batched: true, DataFilters: [isnotnull(priority#153), (priority#153 = HIGH)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(priority), EqualTo(priority,HIGH)], ReadSchema: struct<priority:string>

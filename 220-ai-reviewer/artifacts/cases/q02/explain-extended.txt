@@ -1,0 +1,45 @@
+== Parsed Logical Plan ==
+'Project ['o.o_id, 't.t_id, 'o.amount]
++- 'Filter ('t.priority = HIGH)
+   +- 'Join LeftOuter, ('o.customer_id = 't.customer_id)
+      :- 'SubqueryAlias o
+      :  +- 'UnresolvedRelation [orders], [], false
+      +- 'SubqueryAlias t
+         +- 'UnresolvedRelation [support_tickets], [], false
+
+== Analyzed Logical Plan ==
+o_id: bigint, t_id: bigint, amount: decimal(10,2)
+Project [o_id#140L, t_id#151L, amount#145]
++- Filter (priority#153 = HIGH)
+   +- Join LeftOuter, (customer_id#141L = customer_id#152L)
+      :- SubqueryAlias o
+      :  +- SubqueryAlias spark_catalog.default.orders
+      :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+      +- SubqueryAlias t
+         +- SubqueryAlias spark_catalog.default.support_tickets
+            +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+
+== Optimized Logical Plan ==
+Project [o_id#140L, t_id#151L, amount#145]
++- Join Inner, (customer_id#141L = customer_id#152L)
+   :- Project [o_id#140L, customer_id#141L, amount#145]
+   :  +- Filter isnotnull(customer_id#141L)
+   :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+   +- Project [t_id#151L, customer_id#152L]
+      +- Filter ((isnotnull(priority#153) AND (priority#153 = HIGH)) AND isnotnull(customer_id#152L))
+         +- Relation spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] parquet
+
+== Physical Plan ==
+*(5) Project [o_id#140L, t_id#151L, amount#145]
++- *(5) SortMergeJoin [customer_id#141L], [customer_id#152L], Inner
+   :- *(2) Sort [customer_id#141L ASC NULLS FIRST], false, 0
+   :  +- Exchange hashpartitioning(customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_id=325]
+   :     +- *(1) Filter isnotnull(customer_id#141L)
+   :        +- *(1) ColumnarToRow
+   :           +- FileScan parquet spark_catalog.default.orders[o_id#140L,customer_id#141L,amount#145] Batched: true, DataFilters: [isnotnull(customer_id#141L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(customer_id)], ReadSchema: struct<o_id:bigint,customer_id:bigint,amount:decimal(10,2)>
+   +- *(4) Sort [customer_id#152L ASC NULLS FIRST], false, 0
+      +- Exchange hashpartitioning(customer_id#152L, 200), ENSURE_REQUIREMENTS, [plan_id=335]
+         +- *(3) Project [t_id#151L, customer_id#152L]
+            +- *(3) Filter ((isnotnull(priority#153) AND (priority#153 = HIGH)) AND isnotnull(customer_id#152L))
+               +- *(3) ColumnarToRow
+                  +- FileScan parquet spark_catalog.default.support_tickets[t_id#151L,customer_id#152L,priority#153] Batched: true, DataFilters: [isnotnull(priority#153), (priority#153 = HIGH), isnotnull(customer_id#152L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(priority), EqualTo(priority,HIGH), IsNotNull(customer_id)], ReadSchema: struct<t_id:bigint,customer_id:bigint,priority:string>

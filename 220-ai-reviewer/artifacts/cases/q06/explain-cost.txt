@@ -1,0 +1,27 @@
+== Optimized Logical Plan ==
+Aggregate [o_id#140L, amount#145], [o_id#140L, amount#145, sum(qty#196) AS qty#193L], Statistics(sizeInBytes=116.1 GiB)
++- Project [o_id#140L, amount#145, qty#196], Statistics(sizeInBytes=101.6 GiB)
+   +- Join Inner, (o_id#140L = o_id#195L), Statistics(sizeInBytes=130.6 GiB)
+      :- Project [o_id#140L, amount#145], Statistics(sizeInBytes=101.3 KiB)
+      :  +- Filter isnotnull(o_id#140L), Statistics(sizeInBytes=405.2 KiB)
+      :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet, Statistics(sizeInBytes=405.2 KiB)
+      +- Project [o_id#195L, qty#196], Statistics(sizeInBytes=1320.3 KiB)
+         +- Filter isnotnull(o_id#195L), Statistics(sizeInBytes=2.3 MiB)
+            +- Relation spark_catalog.default.order_items[oi_id#194L,o_id#195L,qty#196,price#197] parquet, Statistics(sizeInBytes=2.3 MiB)
+
+== Physical Plan ==
+*(5) HashAggregate(keys=[o_id#140L, amount#145], functions=[sum(qty#196)], output=[o_id#140L, amount#145, qty#193L])
++- *(5) HashAggregate(keys=[o_id#140L, amount#145], functions=[partial_sum(qty#196)], output=[o_id#140L, amount#145, sum#204L])
+   +- *(5) Project [o_id#140L, amount#145, qty#196]
+      +- *(5) SortMergeJoin [o_id#140L], [o_id#195L], Inner
+         :- *(2) Sort [o_id#140L ASC NULLS FIRST], false, 0
+         :  +- Exchange hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=617]
+         :     +- *(1) Filter isnotnull(o_id#140L)
+         :        +- *(1) ColumnarToRow
+         :           +- FileScan parquet spark_catalog.default.orders[o_id#140L,amount#145] Batched: true, DataFilters: [isnotnull(o_id#140L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+         +- *(4) Sort [o_id#195L ASC NULLS FIRST], false, 0
+            +- Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=626]
+               +- *(3) Filter isnotnull(o_id#195L)
+                  +- *(3) ColumnarToRow
+                     +- FileScan parquet spark_catalog.default.order_items[o_id#195L,qty#196] Batched: true, DataFilters: [isnotnull(o_id#195L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint,qty:int>
+

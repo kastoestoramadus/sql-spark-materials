@@ -1,0 +1,1 @@
+CREATE OR REPLACE TEMP VIEW q32 AS SELECT * FROM VALUES ('1000'),('10%'),('A100'),('10 percent') AS t(nm);

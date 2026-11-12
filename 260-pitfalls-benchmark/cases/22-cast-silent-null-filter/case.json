@@ -1,0 +1,21 @@
+{
+ "n": "22",
+ "name": "cast-silent-null-filter",
+ "difficulty": "medium",
+ "category": "correctness",
+ "pitfall": "022",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "CAST returns NULL",
+  "unparseable",
+  "rows silently dropped"
+ ],
+ "non_defects": [
+  "the NULL row being excluded is ordinary NULL semantics, not the cast defect"
+ ],
+ "df_variants": []
+}

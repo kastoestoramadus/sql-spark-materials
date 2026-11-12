@@ -1,0 +1,24 @@
+== Parsed Logical Plan ==
+'Sort ['nm ASC NULLS FIRST], true
++- 'Project ['nm]
+   +- 'Filter 'nm LIKE %10%%
+      +- 'UnresolvedRelation [q32], [], false
+== Analyzed Logical Plan ==
+nm: string
+Sort [nm#1078 ASC NULLS FIRST], true
++- Project [nm#1078]
+   +- Filter nm#1078 LIKE %10%%
+      +- SubqueryAlias q32
+         +- View (`q32`, [nm#1078])
+            +- Project [cast(nm#1077 as string) AS nm#1078]
+               +- Project [nm#1077]
+                  +- SubqueryAlias t
+                     +- LocalRelation [nm#1077]
+== Optimized Logical Plan ==
+Sort [nm#1078 ASC NULLS FIRST], true
++- LocalRelation [nm#1078]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [nm#1078 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(nm#1078 ASC NULLS FIRST, 4), ENSURE_REQUIREMENTS, [plan_id=3989]
+      +- LocalTableScan [nm#1078]

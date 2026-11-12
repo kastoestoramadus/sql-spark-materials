@@ -1,0 +1,27 @@
+== Parsed Logical Plan ==
+'Sort ['evt ASC NULLS FIRST], true
++- 'Project ['evt, 'amt, 'LAST_VALUE('amt) windowspecdefinition('evt ASC NULLS FIRST, unspecifiedframe$()) AS last_amt#381]
+   +- 'UnresolvedRelation [q11], [], false
+== Analyzed Logical Plan ==
+evt: int, amt: int, last_amt: int
+Sort [evt#388 ASC NULLS FIRST], true
++- Project [evt#388, amt#389, last_amt#381]
+   +- Project [evt#388, amt#389, last_amt#381, last_amt#381]
+      +- Window [last_value(amt#389, false) windowspecdefinition(evt#388 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS last_amt#381], [evt#388 ASC NULLS FIRST]
+         +- Project [evt#388, amt#389]
+            +- SubqueryAlias q11
+               +- View (`q11`, [evt#388, amt#389])
+                  +- Project [cast(evt#386 as int) AS evt#388, cast(amt#387 as int) AS amt#389]
+                     +- Project [evt#386, amt#387]
+                        +- SubqueryAlias t
+                           +- LocalRelation [evt#386, amt#387]
+== Optimized Logical Plan ==
+Sort [evt#388 ASC NULLS FIRST], true
++- Window [last_value(amt#389, false) windowspecdefinition(evt#388 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS last_amt#381], [evt#388 ASC NULLS FIRST]
+   +- LocalRelation [evt#388, amt#389]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Window [last_value(amt#389, false) windowspecdefinition(evt#388 ASC NULLS FIRST, specifiedwindowframe(RangeFrame, unboundedpreceding$(), currentrow$())) AS last_amt#381], [evt#388 ASC NULLS FIRST]
+   +- Sort [evt#388 ASC NULLS FIRST], false, 0
+      +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=1552]
+         +- LocalTableScan [evt#388, amt#389]

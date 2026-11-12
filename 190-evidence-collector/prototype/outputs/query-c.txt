@@ -1,0 +1,9 @@
+(c) runs that read an OLDER schema of customers than the current one
+  current: v2 (updated_at 2026-10-18T18:02:05+00:00)
+  wf_gdpr_purge--r1--a1: UNKNOWN (scan read no columns, e.g. count-only)
+  wf_gdpr_purge--r1--a2: UNKNOWN (scan read no columns, e.g. count-only)
+  wf_gdpr_purge--r2--a1: UNKNOWN (scan read no columns, e.g. count-only)
+  wf_gdpr_purge--r2--a1: subset-consistent (run after current version)
+  wf_risk_report--r1--a1: UNKNOWN (no scan evidence for customers)
+  wf_risk_report--r1--a2: POSSIBLY OLDER - pruned subset and run predates current version
+  wf_risk_report--r2--a1: current

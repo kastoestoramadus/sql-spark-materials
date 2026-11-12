@@ -1,0 +1,111 @@
+== Physical Plan ==
+* Sort (20)
++- Exchange (19)
+   +- * Project (18)
+      +- CartesianProduct Inner (17)
+         :- * Project (12)
+         :  +- * SortMergeJoin Inner (11)
+         :     :- * Sort (5)
+         :     :  +- Exchange (4)
+         :     :     +- * Filter (3)
+         :     :        +- * ColumnarToRow (2)
+         :     :           +- Scan parquet spark_catalog.default.orders (1)
+         :     +- * Sort (10)
+         :        +- Exchange (9)
+         :           +- * Filter (8)
+         :              +- * ColumnarToRow (7)
+         :                 +- Scan parquet spark_catalog.default.customers (6)
+         +- * Project (16)
+            +- * Filter (15)
+               +- * ColumnarToRow (14)
+                  +- Scan parquet spark_catalog.default.support_tickets (13)
+
+
+(1) Scan parquet spark_catalog.default.orders
+Output [2]: [amount#145, region#146]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/orders]
+PushedFilters: [IsNotNull(region)]
+ReadSchema: struct<amount:decimal(10,2),region:string>
+
+(2) ColumnarToRow [codegen id : 1]
+Input [2]: [amount#145, region#146]
+
+(3) Filter [codegen id : 1]
+Input [2]: [amount#145, region#146]
+Condition : isnotnull(region#146)
+
+(4) Exchange
+Input [2]: [amount#145, region#146]
+Arguments: hashpartitioning(region#146, 200), ENSURE_REQUIREMENTS, [plan_id=203]
+
+(5) Sort [codegen id : 2]
+Input [2]: [amount#145, region#146]
+Arguments: [region#146 ASC NULLS FIRST], false, 0
+
+(6) Scan parquet spark_catalog.default.customers
+Output [2]: [name#148, country#149]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/customers]
+PushedFilters: [IsNotNull(country)]
+ReadSchema: struct<name:string,country:string>
+
+(7) ColumnarToRow [codegen id : 3]
+Input [2]: [name#148, country#149]
+
+(8) Filter [codegen id : 3]
+Input [2]: [name#148, country#149]
+Condition : isnotnull(country#149)
+
+(9) Exchange
+Input [2]: [name#148, country#149]
+Arguments: hashpartitioning(country#149, 200), ENSURE_REQUIREMENTS, [plan_id=212]
+
+(10) Sort [codegen id : 4]
+Input [2]: [name#148, country#149]
+Arguments: [country#149 ASC NULLS FIRST], false, 0
+
+(11) SortMergeJoin [codegen id : 5]
+Left keys [1]: [region#146]
+Right keys [1]: [country#149]
+Join type: Inner
+Join condition: None
+
+(12) Project [codegen id : 5]
+Output [2]: [amount#145, name#148]
+Input [4]: [amount#145, region#146, name#148, country#149]
+
+(13) Scan parquet spark_catalog.default.support_tickets
+Output [1]: [priority#153]
+Batched: true
+Location: InMemoryFileIndex [file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/results/220-sql-spark-ai-reviewer-design/artifacts/warehouse/support_tickets]
+PushedFilters: [IsNotNull(priority), EqualTo(priority,HIGH)]
+ReadSchema: struct<priority:string>
+
+(14) ColumnarToRow [codegen id : 6]
+Input [1]: [priority#153]
+
+(15) Filter [codegen id : 6]
+Input [1]: [priority#153]
+Condition : (isnotnull(priority#153) AND (priority#153 = HIGH))
+
+(16) Project [codegen id : 6]
+Output: []
+Input [1]: [priority#153]
+
+(17) CartesianProduct
+Join type: Inner
+Join condition: None
+
+(18) Project [codegen id : 7]
+Output [2]: [name#148, amount#145]
+Input [2]: [amount#145, name#148]
+
+(19) Exchange
+Input [2]: [name#148, amount#145]
+Arguments: rangepartitioning(amount#145 DESC NULLS LAST, 200), ENSURE_REQUIREMENTS, [plan_id=229]
+
+(20) Sort [codegen id : 8]
+Input [2]: [name#148, amount#145]
+Arguments: [amount#145 DESC NULLS LAST], true, 0
+

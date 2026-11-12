@@ -1,0 +1,44 @@
+== Parsed Logical Plan ==
+'Project ['o.o_id, 't.t_id, 'o.amount]
+'Filter ('t.priority = HIGH)
+'Join LeftOuter, ('o.customer_id = 't.customer_id)
+  +- 'SubqueryAlias o
+    +- 'UnresolvedRelation [orders], [], false
+  +- 'SubqueryAlias t
+    +- 'UnresolvedRelation [support_tickets], [], false
+== Analyzed Logical Plan ==
+Project [o_id, t_id, amount]
+Filter (priority = HIGH)
+Join LeftOuter, (customer_id = customer_id)
+  +- SubqueryAlias o
+    +- SubqueryAlias orders
+      +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+  +- SubqueryAlias t
+    +- SubqueryAlias support_tickets
+      +- Relation support_tickets[t_id,customer_id,priority] parquet
+== Optimized Logical Plan ==
+Project [o_id, t_id, amount]
+Join Inner, (customer_id = customer_id)
+Project [o_id, customer_id, amount]
+  +- Filter isnotnull(customer_id)
+    +- Relation orders[o_id,customer_id,status,order_date,order_ts,amount,region] parquet
+Project [t_id, customer_id]
+  +- Filter ((isnotnull(priority) AND (priority = HIGH)) AND isnotnull(customer_id))
+    +- Relation support_tickets[t_id,customer_id,priority] parquet
+== Physical Plan ==
+[wcg]Project [o_id, t_id, amount]
+[wcg]SortMergeJoin [customer_id], [customer_id], Inner
+[wcg]Sort [customer_id ASC NULLS FIRST], false, 0
+  +- Exchange hashpartitioning(customer_id, 200), ENSURE_REQUIREMENTS
+    +- [wcg]Filter isnotnull(customer_id)
+      +- [wcg]ColumnarToRow
+        +- FileScan parquet orders[o_id,customer_id,amount] Batched: true, DataFilters: [isnotnull(customer_id)], Format: Parquet, Location: <paths elided>, PushedFilters: [IsNotNull(customer_id)], Rea
+[wcg]Sort [customer_id ASC NULLS FIRST], false, 0
+  +- Exchange hashpartitioning(customer_id, 200), ENSURE_REQUIREMENTS
+    +- [wcg]Project [t_id, customer_id]
+      +- [wcg]Filter ((isnotnull(priority) AND (priority = HIGH)) AND isnotnull(customer_id))
+        +- [wcg]ColumnarToRow
+          +- FileScan parquet support_tickets[t_id,customer_id,priority] Batched: true, DataFilters: [isnotnull(priority), (priority = HIGH), isnotnull(customer_id), ...(0 more cols elided)], Format: Par
+== WARNINGS (suspicious nodes kept visible) ==
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(customer_id#141L, 200), ENSURE_REQUIREMENTS, [plan_id=325]
+  WARN: Physical Plan: default 200 shuffle partitions for a small shuffle -> Exchange hashpartitioning(customer_id#152L, 200), ENSURE_REQUIREMENTS, [plan_id=335]

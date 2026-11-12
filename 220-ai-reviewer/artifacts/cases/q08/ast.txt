@@ -1,0 +1,25 @@
+Select(
+  expressions=[
+    Column(
+      this=Identifier(this=o_id, quoted=False),
+      table=Identifier(this=o, quoted=False)),
+    Column(
+      this=Identifier(this=amount, quoted=False),
+      table=Identifier(this=o, quoted=False))],
+  from_=From(
+    this=Table(
+      this=Identifier(this=orders, quoted=False),
+      alias=TableAlias(
+        this=Identifier(this=o, quoted=False)))),
+  where=Where(
+    this=GTE(
+      this=TsOrDsToDate(
+        this=Column(
+          this=Identifier(this=order_ts, quoted=False),
+          table=Identifier(this=o, quoted=False)),
+        format=Literal(this='%mstrict/%dstrict/%Y', is_string=True),
+        safe=True),
+      expression=Cast(
+        this=Literal(this='2024-01-01', is_string=True),
+        to=DataType(this=DType.DATE, nested=False),
+        _type=DataType(this=DType.DATE, nested=False)))))

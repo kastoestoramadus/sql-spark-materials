@@ -1,0 +1,38 @@
+== Parsed Logical Plan ==
+'Project [unresolvedalias('COUNT(1))]
++- 'Join Inner, ('unix_timestamp('to_timestamp('e.ts, yyyy-MM-dd HH:mm:ss)) >= 'c.cutoff_epoch)
+   :- 'SubqueryAlias e
+   :  +- 'UnresolvedRelation [q25], [], false
+   +- 'SubqueryAlias c
+      +- 'UnresolvedRelation [q25cutoff], [], false
+== Analyzed Logical Plan ==
+count(1): bigint
+Aggregate [count(1) AS count(1)#818L]
++- Join Inner, (unix_timestamp(to_timestamp(ts#814, Some(yyyy-MM-dd HH:mm:ss), TimestampType, Some(UTC), true), yyyy-MM-dd HH:mm:ss, Some(UTC), true) >= cutoff_epoch#816L)
+   :- SubqueryAlias e
+   :  +- SubqueryAlias q25
+   :     +- View (`q25`, [ts#814])
+   :        +- Project [cast(ts#813 as string) AS ts#814]
+   :           +- Project [ts#813]
+   :              +- SubqueryAlias t
+   :                 +- LocalRelation [ts#813]
+   +- SubqueryAlias c
+      +- SubqueryAlias q25cutoff
+         +- View (`q25cutoff`, [cutoff_epoch#816L])
+            +- Project [cast(cutoff_epoch#815L as bigint) AS cutoff_epoch#816L]
+               +- Project [1781515200 AS cutoff_epoch#815L]
+                  +- OneRowRelation
+== Optimized Logical Plan ==
+Aggregate [count(1) AS count(1)#818L]
++- Join Inner
+   :- LocalRelation
+   +- OneRowRelation
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[], functions=[count(1)], output=[count(1)#818L])
+   +- Exchange SinglePartition, ENSURE_REQUIREMENTS, [plan_id=2956]
+      +- HashAggregate(keys=[], functions=[partial_count(1)], output=[count#820L])
+         +- BroadcastNestedLoopJoin BuildRight, Inner
+            :- LocalTableScan
+            +- BroadcastExchange IdentityBroadcastMode, [plan_id=2952]
+               +- Scan OneRowRelation[]

@@ -1,0 +1,61 @@
+== Parsed Logical Plan ==
+'Aggregate ['o.o_id], ['o.o_id, 'SUM('o.amount) AS total#221]
++- 'Join Inner, ('o.o_id = 'i2.o_id)
+   :- 'Join Inner, ('o.o_id = 'i1.o_id)
+   :  :- 'SubqueryAlias o
+   :  :  +- 'UnresolvedRelation [orders], [], false
+   :  +- 'SubqueryAlias i1
+   :     +- 'UnresolvedRelation [order_items], [], false
+   +- 'SubqueryAlias i2
+      +- 'UnresolvedRelation [order_items], [], false
+
+== Analyzed Logical Plan ==
+o_id: bigint, total: decimal(20,2)
+Aggregate [o_id#140L], [o_id#140L, sum(amount#145) AS total#221]
++- Join Inner, (o_id#140L = o_id#223L)
+   :- Join Inner, (o_id#140L = o_id#195L)
+   :  :- SubqueryAlias o
+   :  :  +- SubqueryAlias spark_catalog.default.orders
+   :  :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+   :  +- SubqueryAlias i1
+   :     +- SubqueryAlias spark_catalog.default.order_items
+   :        +- Relation spark_catalog.default.order_items[oi_id#194L,o_id#195L,qty#196,price#197] parquet
+   +- SubqueryAlias i2
+      +- SubqueryAlias spark_catalog.default.order_items
+         +- Relation spark_catalog.default.order_items[oi_id#222L,o_id#223L,qty#224,price#225] parquet
+
+== Optimized Logical Plan ==
+Aggregate [o_id#140L], [o_id#140L, sum(amount#145) AS total#221]
++- Project [o_id#140L, amount#145]
+   +- Join Inner, (o_id#140L = o_id#223L)
+      :- Project [o_id#140L, amount#145]
+      :  +- Join Inner, (o_id#140L = o_id#195L)
+      :     :- Project [o_id#140L, amount#145]
+      :     :  +- Filter isnotnull(o_id#140L)
+      :     :     +- Relation spark_catalog.default.orders[o_id#140L,customer_id#141L,status#142,order_date#143,order_ts#144,amount#145,region#146] parquet
+      :     +- Project [o_id#195L]
+      :        +- Filter isnotnull(o_id#195L)
+      :           +- Relation spark_catalog.default.order_items[oi_id#194L,o_id#195L,qty#196,price#197] parquet
+      +- Project [o_id#223L]
+         +- Filter isnotnull(o_id#223L)
+            +- Relation spark_catalog.default.order_items[oi_id#222L,o_id#223L,qty#224,price#225] parquet
+
+== Physical Plan ==
+*(8) HashAggregate(keys=[o_id#140L], functions=[sum(amount#145)], output=[o_id#140L, total#221])
++- *(8) HashAggregate(keys=[o_id#140L], functions=[partial_sum(amount#145)], output=[o_id#140L, sum#232, isEmpty#233])
+   +- *(8) Project [o_id#140L, amount#145]
+      +- *(8) SortMergeJoin [o_id#140L], [o_id#223L], Inner
+         :- *(5) Project [o_id#140L, amount#145]
+         :  +- *(5) SortMergeJoin [o_id#140L], [o_id#195L], Inner
+         :     :- *(2) Sort [o_id#140L ASC NULLS FIRST], false, 0
+         :     :  +- Exchange hashpartitioning(o_id#140L, 200), ENSURE_REQUIREMENTS, [plan_id=844]
+         :     :     +- *(1) Filter isnotnull(o_id#140L)
+         :     :        +- *(1) ColumnarToRow
+         :     :           +- FileScan parquet spark_catalog.default.orders[o_id#140L,amount#145] Batched: true, DataFilters: [isnotnull(o_id#140L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint,amount:decimal(10,2)>
+         :     +- *(4) Sort [o_id#195L ASC NULLS FIRST], false, 0
+         :        +- Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=853]
+         :           +- *(3) Filter isnotnull(o_id#195L)
+         :              +- *(3) ColumnarToRow
+         :                 +- FileScan parquet spark_catalog.default.order_items[o_id#195L] Batched: true, DataFilters: [isnotnull(o_id#195L)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/walidus/ai-based-projects/idle-coordinator/data/queue/resul..., PartitionFilters: [], PushedFilters: [IsNotNull(o_id)], ReadSchema: struct<o_id:bigint>
+         +- *(7) Sort [o_id#223L ASC NULLS FIRST], false, 0
+            +- ReusedExchange [o_id#223L], Exchange hashpartitioning(o_id#195L, 200), ENSURE_REQUIREMENTS, [plan_id=853]

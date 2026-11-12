@@ -1,0 +1,17 @@
+== Parsed Logical Plan ==
+'Project [('d + INTERVAL '31' DAY) AS next_month#942]
++- 'UnresolvedRelation [q28], [], false
+== Analyzed Logical Plan ==
+next_month: date
+Project [date_add(d#948, extractansiintervaldays(INTERVAL '31' DAY)) AS next_month#942]
++- SubqueryAlias q28
+   +- View (`q28`, [d#948])
+      +- Project [cast(d#947 as date) AS d#948]
+         +- Project [2026-01-31 AS d#947]
+            +- OneRowRelation
+== Optimized Logical Plan ==
+Project [2026-03-03 AS next_month#942]
++- OneRowRelation
+== Physical Plan ==
+*(1) Project [2026-03-03 AS next_month#942]
++- *(1) Scan OneRowRelation[]

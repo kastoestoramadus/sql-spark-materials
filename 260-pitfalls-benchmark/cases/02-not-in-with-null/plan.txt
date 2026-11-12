@@ -1,0 +1,33 @@
+== Parsed Logical Plan ==
+'Project ['id]
++- 'Filter NOT 'id IN (list#20 [])
+   :  +- 'Project ['deny]
+   :     +- 'UnresolvedRelation [q02b], [], false
+   +- 'UnresolvedRelation [q02a], [], false
+== Analyzed Logical Plan ==
+id: int
+Project [id#26]
++- Filter NOT id#26 IN (list#20 [])
+   :  +- Project [deny#28]
+   :     +- SubqueryAlias q02b
+   :        +- View (`q02b`, [deny#28])
+   :           +- Project [cast(deny#27 as int) AS deny#28]
+   :              +- Project [deny#27]
+   :                 +- SubqueryAlias t
+   :                    +- LocalRelation [deny#27]
+   +- SubqueryAlias q02a
+      +- View (`q02a`, [id#26])
+         +- Project [cast(id#25 as int) AS id#26]
+            +- Project [id#25]
+               +- SubqueryAlias t
+                  +- LocalRelation [id#25]
+== Optimized Logical Plan ==
+Join LeftAnti, ((id#26 = deny#28) OR isnull((id#26 = deny#28)))
+:- LocalRelation [id#26]
++- LocalRelation [deny#28]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- BroadcastHashJoin [id#26], [deny#28], LeftAnti, BuildRight, true, false
+   :- LocalTableScan [id#26]
+   +- BroadcastExchange HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),true), [plan_id=48]
+      +- LocalTableScan [deny#28]

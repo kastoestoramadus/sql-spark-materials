@@ -1,0 +1,16 @@
+== Parsed Logical Plan ==
+'Project [*]
++- 'UnresolvedRelation [q31dim], [], false
+== Analyzed Logical Plan ==
+code: string, tier: string
+Project [code#1018, tier#1019]
++- SubqueryAlias q31dim
+   +- View (`q31dim`, [code#1018, tier#1019])
+      +- Project [cast(code#1016 as string) AS code#1018, cast(tier#1017 as string) AS tier#1019]
+         +- Project [code#1016, tier#1017]
+            +- SubqueryAlias t
+               +- LocalRelation [code#1016, tier#1017]
+== Optimized Logical Plan ==
+LocalRelation [code#1018, tier#1019]
+== Physical Plan ==
+LocalTableScan [code#1018, tier#1019]

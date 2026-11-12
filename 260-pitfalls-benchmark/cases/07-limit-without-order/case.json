@@ -1,0 +1,25 @@
+{
+ "n": "07",
+ "name": "limit-without-order",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "007",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "LIMIT without ORDER BY",
+  "nondeterministic or arbitrary rows"
+ ],
+ "non_defects": [
+  "200 rows being sampled is fine",
+  "the % 7 expression is not the defect"
+ ],
+ "df_variants": [
+  "spark.table('q07').repartition(8).limit(5)",
+  "spark.table('q07').repartition(23).limit(5)",
+  "spark.table('q07').orderBy('id').limit(5)"
+ ]
+}

@@ -1,0 +1,1 @@
+CREATE OR REPLACE TEMP VIEW q10 AS SELECT * FROM VALUES (1,1,10),(1,2,20),(1,2,50),(1,3,5) AS t(acct,evt,amt);

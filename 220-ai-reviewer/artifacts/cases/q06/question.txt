@@ -1,0 +1,3 @@
+Find the defect in this query (correctness or serious performance problem).
+
+SELECT o.o_id, o.amount, SUM(i.qty) AS qty FROM orders o JOIN order_items i ON o.o_id = i.o_id GROUP BY o.o_id, o.amount

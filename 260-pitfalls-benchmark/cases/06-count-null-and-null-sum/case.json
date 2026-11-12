@@ -1,0 +1,22 @@
+{
+ "n": "06",
+ "name": "count-null-and-null-sum",
+ "difficulty": "easy",
+ "category": "correctness",
+ "pitfall": "006",
+ "variants": [
+  {
+   "tz": "UTC"
+  }
+ ],
+ "required_findings": [
+  "COUNT(col) skips NULL",
+  "SUM of all-NULL is NULL",
+  "COALESCE"
+ ],
+ "non_defects": [
+  "dept 'a' having one non-NULL bonus counted is correct",
+  "ORDER BY dept is fine"
+ ],
+ "df_variants": []
+}

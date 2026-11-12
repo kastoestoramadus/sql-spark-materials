@@ -1,0 +1,26 @@
+== Parsed Logical Plan ==
+'Sort ['dept ASC NULLS FIRST], true
++- 'Aggregate ['dept], ['dept, 'COUNT('bonus) AS rows_with_bonus#150, 'SUM('bonus) AS total#151]
+   +- 'UnresolvedRelation [q06], [], false
+== Analyzed Logical Plan ==
+dept: string, rows_with_bonus: bigint, total: double
+Sort [dept#158 ASC NULLS FIRST], true
++- Aggregate [dept#158], [dept#158, count(bonus#159) AS rows_with_bonus#150L, sum(bonus#159) AS total#151]
+   +- SubqueryAlias q06
+      +- View (`q06`, [dept#158, bonus#159])
+         +- Project [cast(dept#156 as string) AS dept#158, cast(bonus#157 as double) AS bonus#159]
+            +- Project [dept#156, bonus#157]
+               +- SubqueryAlias t
+                  +- LocalRelation [dept#156, bonus#157]
+== Optimized Logical Plan ==
+Sort [dept#158 ASC NULLS FIRST], true
++- Aggregate [dept#158], [dept#158, count(bonus#159) AS rows_with_bonus#150L, sum(bonus#159) AS total#151]
+   +- LocalRelation [dept#158, bonus#159]
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [dept#158 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(dept#158 ASC NULLS FIRST, 4), ENSURE_REQUIREMENTS, [plan_id=676]
+      +- HashAggregate(keys=[dept#158], functions=[count(bonus#159), sum(bonus#159)], output=[dept#158, rows_with_bonus#150L, total#151])
+         +- Exchange hashpartitioning(dept#158, 4), ENSURE_REQUIREMENTS, [plan_id=673]
+            +- HashAggregate(keys=[dept#158], functions=[partial_count(bonus#159), partial_sum(bonus#159)], output=[dept#158, count#164L, sum#165])
+               +- LocalTableScan [dept#158, bonus#159]

@@ -1,0 +1,5 @@
+(a) latest run per workflow (attempted vs successful), with plan hash
+  wf_gdpr_purge: latest attempted wf_gdpr_purge--r1--a2 exit=1 completeness=complete plans=[c85bad5103a7bd9c]
+    latest SUCCESSFUL differs: wf_gdpr_purge--r2--a1 plans=[c85bad5103a7bd9c,f6d9a6e8dac5b9dd] (latest attempted failed)
+  wf_risk_report: latest attempted wf_risk_report--r2--a1 exit=0 completeness=complete plans=[e7a81d149d73e8a6]
+  wf_sales_daily: latest attempted wf_sales_daily--r2--a1 exit=0 completeness=complete plans=[eb3b82874297ecdf,baad7360c255d413]

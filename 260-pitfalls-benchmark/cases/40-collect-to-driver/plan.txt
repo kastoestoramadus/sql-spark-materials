@@ -1,0 +1,17 @@
+== Parsed Logical Plan ==
+'Project [*]
++- 'UnresolvedRelation [q40], [], false
+== Analyzed Logical Plan ==
+id: bigint, grp: bigint, pad: string
+Project [id#1559L, grp#1560L, pad#1561]
++- SubqueryAlias q40
+   +- View (`q40`, [id#1559L, grp#1560L, pad#1561])
+      +- Project [cast(id#1562L as bigint) AS id#1559L, cast(grp#1557L as bigint) AS grp#1560L, cast(pad#1558 as string) AS pad#1561]
+         +- Project [id#1562L, (id#1562L % cast(100 as bigint)) AS grp#1557L, lpad(cast(id#1562L as string), 50, x) AS pad#1558]
+            +- Range (0, 100000, step=1)
+== Optimized Logical Plan ==
+Project [id#1562L, (id#1562L % 100) AS grp#1560L, lpad(cast(id#1562L as string), 50, x) AS pad#1561]
++- Range (0, 100000, step=1)
+== Physical Plan ==
+*(1) Project [id#1562L, (id#1562L % 100) AS grp#1560L, lpad(cast(id#1562L as string), 50, x) AS pad#1561]
++- *(1) Range (0, 100000, step=1, splits=1)
